@@ -1,0 +1,9 @@
+Python sys==3.10.9 | packaged by conda-forge 
+pandas==1.5.3
+numpy==1.23.5
+mne==1.3.0  | pip install
+sci-py==1.10.0
+matplotlib==3.6.3
+openpyxl==3.0.10
+jupyter==1.0.0
+pymatreader==0.0.30 | packaged by conda-forge 
