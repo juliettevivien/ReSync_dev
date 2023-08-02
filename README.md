@@ -21,8 +21,8 @@ This repo is structured as follows:
 │   ├── preprocessing
 │   ├── tmsi_poly5reader
 │   └── utils
-├── notebook
-│   └── ReSync.ipynb
+└── notebook
+    └── ReSync.ipynb
 
 ```
 ```env_requirements``` contains all the packages and their version needed to run the ReSync algorithm.
