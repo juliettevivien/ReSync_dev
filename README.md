@@ -51,10 +51,11 @@ These instructions will get you a copy of the project up and running on your loc
 
 * **Juliette Vivien** - *Initial work* -
 
+* **Jeroen Habets** - *Contributor* - https://github.com/jgvhabets
+
 ## Questions or contributions
 Please don't hesitate to reach out if any questions or suggestions! @ juliette.vivien@charite.de  or https://twitter.com/vivien_juliette
 
-Contributor: https://github.com/jgvhabets
 
 ## License
 
