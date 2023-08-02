@@ -10,9 +10,7 @@ This repo is structured as follows:
 ├── LICENSE.txt
 ├── README.md
 ├── setup.py
-├── conda_requirements.txt
-├── create_conda_env.bat
-├── add_env_pip_packages.bat
+├── env_requirements.txt
 ├── config
 ├── functions
 │   ├── crop
@@ -27,7 +25,7 @@ This repo is structured as follows:
 │   └── ReSync.ipynb
 
 ```
-
+```env_requirements``` contains all the packages and their version needed to run the ReSync algorithm.
 ```notebook``` contains the jupyter notebook to run resync functions. ```main_resync``` contains the two main functions used for the analysis: ```run_resync``` and ```run_timeshift_analysis```.
 
 ## Getting Started
@@ -41,12 +39,8 @@ These instructions will get you a copy of the project up and running on your loc
     - to check initiated remote-repo link, and current branch: ```cd ReSync```, ```git init```, ```git remote -v```, ```git branch``` (switch to branch main e.g. with git checkout main)
 
 ### Environment
-* GUI: Create a python environment with the correct requirements. Either use the GUI of a environments-manager (such as anaconda), and install all dependencies mentioned in the setup.py.
-* Command line: you can easily install the required environment from your command line prompt. Note: since some packages are only available via ```pip install```, the environment-installation requires 2 commands: one for ```conda install```, and one for ```pip install```. Steps to perform in your (anaconda) prompt:
-    - navigate to repo directory, e.g.: ```cd Users/USERNAME/Research/ReSync```
-    - create environment using batch install: ```.\create_conda_env.bat``` (confirm Proceed? with ```y```)
-    - install additional packages to environment (required for pip install packages): ```.\add_env_pip_packages.bat```
-    - activate conda environment with: ```conda activate resync```
+* GUI: Create a python environment with the correct requirements. Either use the GUI of a environments-manager (such as anaconda), and install all dependencies mentioned in the env_requirements.txt.
+
 
 ## User Instructions:
 
