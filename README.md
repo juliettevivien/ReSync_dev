@@ -49,7 +49,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Authors
 
-* **Juliette Vivien** - *Initial work* - 
+* **Juliette Vivien** - *Initial work* -
+
+## Questions or contributions
+Please don't hesitate to reach out if any questions or suggestions! @ juliette.vivien@charite.de  or https://twitter.com/vivien_juliette
 
 Contributor: https://github.com/jgvhabets
 
