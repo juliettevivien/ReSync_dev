@@ -32,13 +32,13 @@ This repo is structured as follows:
 
 These instructions will get you a copy of the project up and running on your local machine. 
 
-### Repository
+#### Repository
 * GUI: use a git-manager of preference, and clone: https://github.com/juliettevivien/ReSync.git
 * Command line:
     - set working directory to desired folder and run: ```git clone https://github.com/juliettevivien/ReSync.git```
     - to check initiated remote-repo link, and current branch: ```cd ReSync```, ```git init```, ```git remote -v```, ```git branch``` (switch to branch main e.g. with git checkout main)
 
-### Environment
+#### Environment
 * GUI: Create a python environment with the correct requirements. Either use the GUI of a environments-manager (such as anaconda), and install all dependencies mentioned in the env_requirements.txt.
 
 
