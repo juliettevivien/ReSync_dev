@@ -5,5 +5,5 @@ scipy==1.10.0
 matplotlib==3.6.3
 openpyxl==3.0.10
 jupyter==1.0.0
-pymatreader==0.0.30 | packaged by conda-forge 
+pymatreader==0.0.30 | packaged by conda-forge or pip install
 mne==1.3.0  | pip install
