@@ -64,7 +64,7 @@ These instructions will get you a copy of the project up and running on your loc
     "LFP_ch_index": 0, # the index of the channel containing the artefacts in the intracerebral recorder
     "BIP_ch_index": 0, # the index of the channel containing the artefacts in the external recorder (bipolar channel)
     "kernel": "1", # the kernel to use for artefact detection in intracerebral channel (either "1" or "2")
-    "thresh_external": false,  # leave to false if the artefacts in the external recording are properly detected, but insert a value if artefacts are not well detected (this value depends on the sampling frequency of the external data recorder)
+    "thresh_external": false,  # leave to false if the artefacts in the external recording are properly detected, but insert a value if artefacts are not well detected (this value depends on the sampling frequency of the external data recorder, our default threshold is set to -0.001)
     "real_index_LFP": -1, # change this value if the sample detected as start of the artefact in intracerebral channel (as seen in the figure) is not correct --> in this example, the algorithm detected the start of the artefact as one sample too far.
     "consider_first_seconds_LFP": 20, # change this delay (in seconds) if the session was in StimOn, it will only look for artefacts during the X first seconds and X last seconds of the recording 
     "consider_first_seconds_external": null, # change this delay (in seconds) if the session was in StimOn, it will only look for artefacts during the X first seconds and X last seconds of the recording 
