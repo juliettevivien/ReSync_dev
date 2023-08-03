@@ -44,8 +44,7 @@ These instructions will get you a copy of the project up and running on your loc
     - navigate to repo directory, e.g.: ```cd Users/USERNAME/Research/ReSync```
     - ```conda create --name resync python==3.10.9 pandas==1.5.3 scipy==1.10.0 numpy==1.23.5 matplotlib==3.6.3 openpyxl==3.0.10 jupyter==1.0.0``` (Confirm Proceed? with ```y```)
     - ```conda activate resync```
-    - ```conda install --channel=conda-forge pymatreader==0.0.30```
-    - ```pip install mne==1.3.0```
+    - ```pip install mne==1.3.0 pymatreader```
 
 
 ## User Instructions:
