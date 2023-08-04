@@ -80,6 +80,10 @@ def run_resync(
     with open(os.path.join(json_path, json_filename), 'r') as f:
         loaded_dict =  json.load(f)
 
+    # check that the subject ID has been entered properly in the config file:
+    if loaded_dict['subject_ID'] is None or loaded_dict['subject_ID'] == "":
+        raise ValueError('Please fill in the subject_ID in the config file as a str')
+
     # set saving path
     if loaded_dict['saving_path'] == False:
         saving_path = utils.define_folders()
@@ -87,6 +91,8 @@ def run_resync(
         saving_path = os.path.join(os.path.normpath(loaded_dict['saving_path']), loaded_dict['subject_ID'])
         if not os.path.isdir(saving_path):
             os.makedirs(saving_path)
+
+
 
     ### DETECT ARTEFACTS ###
 
@@ -167,6 +173,7 @@ def run_resync(
     plt.savefig(saving_path + '\\Intracerebral channel with artefacts detected - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
+    
 
     # PLOT 4 : plot the first artefact detected in intracerebral channel for verification of sample choice:
     plot.plot_channel(loaded_dict['subject_ID'], 
@@ -187,7 +194,26 @@ def run_resync(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
-    # PLOT 5 : plot the external channel with its artefacts detected:
+    # PLOT 5 : plot the artefact adjusted by user in the intracerebral channel:
+    plot.plot_channel(loaded_dict['subject_ID'], 
+                      LFP_timescale_s, 
+                      lfp_sig, 'darkorange',
+                      scatter=True)
+    plt.ylabel('Intracerebral LFP channel (µV)')
+    for xline in art_time_LFP:
+        plt.axvline(x=xline+(loaded_dict['real_index_LFP']/loaded_dict['sf_LFP']), 
+                    ymin=min(lfp_sig), 
+                    ymax=max(lfp_sig), 
+                    color='black', 
+                    linestyle='dashed', 
+                    alpha=.3,)
+    plt.xlim(art_time_LFP[0]-0.1,art_time_LFP[0]+0.3)
+    plt.gcf()
+    plt.savefig(saving_path + '\\Intracerebral channel - first artefact detected with correction by user - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
+    if SHOW_FIGURES: plt.show()
+    else: plt.close()
+
+    # PLOT 6 : plot the external channel with its artefacts detected:
     plot.plot_channel(loaded_dict['subject_ID'], 
                       external_timescale_s, 
                       BIP_channel, 
@@ -203,7 +229,7 @@ def run_resync(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
-    # PLOT 6 : plot the first artefact detected in external channel for verification of sample choice:
+    # PLOT 7 : plot the first artefact detected in external channel for verification of sample choice:
     plot.plot_channel(loaded_dict['subject_ID'], 
                       external_timescale_s, 
                       BIP_channel, 
@@ -220,6 +246,8 @@ def run_resync(
     plt.savefig(saving_path + '\\External bipolar channel - first artefact detected.png',bbox_inches='tight')   
     if SHOW_FIGURES: plt.show()
     else: plt.close()
+
+    print('Alignment successful! Please check all figures for proper sample selection as start of the artefact, and correct in the config file if necessary before re-running')
 
     return LFP_df_offset, external_df_offset
 
