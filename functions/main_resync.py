@@ -247,7 +247,12 @@ def run_resync(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
-    print('Alignment successful! Please check carefully all figures for proper sample selection as start of the artefact, and correct in the config file if necessary before re-running')
+    print(
+        'Alignment successful! \n' 
+        'Please check carefully in all figures that the samples selected \n'
+        'as start of the artefact are correct, and if they are not \n'
+        'please correct parameters accordingly in the config file before re-running'
+    )
 
     return LFP_df_offset, external_df_offset
 
@@ -363,9 +368,25 @@ def run_timeshift_analysis(
 
     # first, let's check that the values in the config file are corresponding to real artefacts detected:
     if len(loaded_dict['index_real_artefacts_LFP']) > len(art_time_LFP_offset):
-        raise ValueError('Indexes incorrect for intracerebral recording. Please check Fig8 to find the real indexes of detected artefacts, and change config file accordingly')
+        raise ValueError(
+            'Indexes incorrect for intracerebral recording. \n'
+            'Please check Fig8 to find the real indexes of detected artefacts, \n'
+            'and change config file accordingly'
+        )
     if len(loaded_dict['index_real_artefacts_BIP']) > len(art_time_BIP_offset):
-        raise ValueError('Indexes incorrect for external recording. Please check Fig8 to find the real indexes of detected artefacts, and change config file accordingly')    
+        raise ValueError(
+            'Indexes incorrect for external recording. \n'
+            'Please check Fig8 to find the real indexes of detected artefacts, \n'
+            'and change config file accordingly'
+        )
+    if len(loaded_dict['index_real_artefacts_BIP']) != len(loaded_dict['index_real_artefacts_LFP']):
+        raise ValueError(
+            'The number of artefacts should be the same in intracerebral and external recordings. \n'
+            'Please check Fig8 to find the real indexes of detected artefacts, \n'
+            'and change config file accordingly. \n'
+            'If an artefact is detected only in one of the recordings, do not select it.'
+        )
+
     
 
     real_art_time_LFP_offset= utils.extract_elements(art_time_LFP_offset,
@@ -387,8 +408,17 @@ def run_timeshift_analysis(
         delay_ms.append(delay[i]*1000)
     
     mean_diff = sum(delay_ms)/len(delay_ms)
+    if abs(mean_diff) > 50:
+        raise ValueError(
+            'The artefacts selected might not be correct because the timeshift is very high. \n'
+            'Please check again Fig8 and adjust indexes in config file. \n'
+            'If an artefact is detected only in one of the recordings, do not select it.'
+        )
     
     timeshift = delay_ms[-1]
+
+    # find the time of the last artefact detected:
+    last_art_time = real_art_time_LFP_offset[-1]
 
 
     ## PLOTING ##
@@ -403,7 +433,7 @@ def run_timeshift_analysis(
         # add a new subplot iteratively
         ax1 = plt.subplot(2, len(delay_ms), n + 1)
         ax2 = plt.subplot(2, len(delay_ms), m + 1)
-        ax1.axes.xaxis.set_ticklabels([])
+        #ax1.axes.xaxis.set_ticklabels([])
         ax2.axes.xaxis.set_major_formatter('{:.2f}'.format)
         ax2.set_xlabel('Time (s)')
         ax1.set_ylabel('Intracerebral LFP channel (µV)')
@@ -430,4 +460,8 @@ def run_timeshift_analysis(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
-    return timeshift
+    print(
+        f'Timeshift analysis performed! \n'
+        f'The result is: {timeshift} ms delay at the last detected artefact, \n'
+        f'after a recording duration of {last_art_time}s.'
+    )
