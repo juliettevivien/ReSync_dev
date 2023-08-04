@@ -38,6 +38,11 @@ def load_TMSi_artefact_channel(
 	if is_channel_in_list(external_rec_ch_names, loaded_dict['ch_name_BIP']):
 		ch_t = TMSi_rec.ch_names.index(loaded_dict['ch_name_BIP'])
 		TMSi_channel = TMSi_rec.get_data()[ch_t]
+		loaded_dict['BIP_ch_index'] = ch_t
+
+		# save dict as JSON, 'w' stands for write
+		with open(os.path.join(json_path, json_filename), 'w') as f:
+				json.dump(loaded_dict, f, indent=4)
 		
 		print(     
 			f'The data object has:\n\t{TMSi_rec.n_times} time samples,'      
