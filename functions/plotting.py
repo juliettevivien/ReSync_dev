@@ -36,7 +36,7 @@ def plot_LFP_artefact_channel(
     plt.ylabel('Intracerebral LFP channel (µV)')
 
     if saving_folder:
-        plt.savefig(savingpath + '\\Fig1: Intracerebral channel raw plot.png',bbox_inches='tight')
+        plt.savefig(savingpath + '\\Fig1-Intracerebral channel raw plot.png',bbox_inches='tight')
 
 
 
@@ -74,7 +74,7 @@ def plot_BIP_artefact_channel(
     plt.ylabel('External bipolar channel - voltage (mV)')
 
     if saving_folder:
-        plt.savefig(savingpath + '\\Fig2: External bipolar channel raw plot.png',bbox_inches='tight')
+        plt.savefig(savingpath + '\\Fig2-External bipolar channel raw plot.png',bbox_inches='tight')
 
 
 

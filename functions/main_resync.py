@@ -170,7 +170,7 @@ def run_resync(
                     linestyle='dashed',
                     alpha=.3,)
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig3: Intracerebral channel with artefacts detected - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig3-Intracerebral channel with artefacts detected - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
     
@@ -190,7 +190,7 @@ def run_resync(
                     alpha=.3,)
     plt.xlim(art_time_LFP[0]-0.1,art_time_LFP[0]+0.3)
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig4: Intracerebral channel - first artefact detected - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig4-Intracerebral channel - first artefact detected - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -209,7 +209,7 @@ def run_resync(
                     alpha=.3,)
     plt.xlim(art_time_LFP[0]-0.1,art_time_LFP[0]+0.3)
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig5: Intracerebral channel - first artefact detected with correction by user - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig5-Intracerebral channel - first artefact detected with correction by user - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -225,7 +225,7 @@ def run_resync(
                     linestyle='dashed', 
                     alpha=.3,)
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig6: External bipolar channel with artefacts detected.png',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig6-External bipolar channel with artefacts detected.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -243,7 +243,7 @@ def run_resync(
                     alpha=.3,)
     plt.xlim(art_time_BIP[0]-0.015, art_time_BIP[0]+0.015)
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig7: External bipolar channel - first artefact detected.png',bbox_inches='tight')   
+    plt.savefig(saving_path + '\\Fig7-External bipolar channel - first artefact detected.png',bbox_inches='tight')   
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -350,7 +350,7 @@ def run_timeshift_analysis(
     for xline in art_time_BIP_offset:
         ax2.axvline(x=xline, color='black', linestyle='dashed', alpha=.3,)
 
-    fig.savefig(saving_path + '\\Fig8: Intracerebral and external aligned channels with artefacts.png',bbox_inches='tight')
+    fig.savefig(saving_path + '\\Fig8-Intracerebral and external recordings aligned with artefacts detected.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -363,9 +363,9 @@ def run_timeshift_analysis(
 
     # first, let's check that the values in the config file are corresponding to real artefacts detected:
     if len(loaded_dict['index_real_artefacts_LFP']) > len(art_time_LFP_offset):
-        raise ValueError('Please check Fig8 to find the real artefact indexes in intracerebral recording')
+        raise ValueError('Indexes incorrect for intracerebral recording. Please check Fig8 to find the real indexes of detected artefacts, and change config file accordingly')
     if len(loaded_dict['index_real_artefacts_BIP']) > len(art_time_BIP_offset):
-        raise ValueError('Please check Fig8 to find the real artefact indexes in intracerebral recording')    
+        raise ValueError('Indexes incorrect for external recording. Please check Fig8 to find the real indexes of detected artefacts, and change config file accordingly')    
     
 
     real_art_time_LFP_offset= utils.extract_elements(art_time_LFP_offset,
@@ -426,7 +426,7 @@ def run_timeshift_analysis(
         ax1.text(0.05,0.85,s='delay intra/exter: ' +str(round(delay_ms[n],2))+ 'ms',fontsize=14,transform=ax1.transAxes)
 
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig9: Intracerebral and external aligned channels - timeshift all artefacts.png',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig9-Intracerebral and external aligned channels - timeshift all artefacts.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
