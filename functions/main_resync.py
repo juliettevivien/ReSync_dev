@@ -92,49 +92,6 @@ def run_resync(
         if not os.path.isdir(saving_path):
             os.makedirs(saving_path)
 
-
-
-    ### DETECT ARTEFACTS ###
-
-    # find artefacts in intracerebral channel
-    art_idx_LFP = artefact.find_LFP_sync_artefact(
-        lfp_sig,
-        use_kernel=loaded_dict['kernel'], 
-        consider_first_seconds_LFP=loaded_dict['consider_first_seconds_LFP']
-    )
-
-    art_time_LFP = utils.convert_index_to_time(art_idx_LFP,
-                                               loaded_dict['sf_LFP']) 
-
-    # find artefacts in external bipolar channel
-    filtered_external = preproc.filtering(BIP_channel) # preprocessing of external bipolar channel
-
-    art_idx_BIP = artefact.find_external_sync_artefact(data= filtered_external, 
-                                                       ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
-                                                       consider_first_seconds_external=loaded_dict['consider_first_seconds_external'])
-    art_time_BIP = utils.convert_index_to_time(art_idx_BIP, 
-                                               loaded_dict['sf_external'])
-
-    # crop intracerebral and external recordings 1 second before first artefact
-    (LFP_df_offset, 
-     external_df_offset) = crop.crop_rec(LFP_array, 
-                                         external_file, 
-                                         art_time_LFP, 
-                                         art_time_BIP, 
-                                         LFP_rec_ch_names, 
-                                         external_rec_ch_names, 
-                                         loaded_dict['real_index_LFP'])
-
-    ###  SAVE CROPPED RECORDINGS ###
-    #Save LFP:
-    LFP_df_offset.to_csv(saving_path + '\\Intracerebral_LFP_' + loaded_dict['subject_ID'] + '_' + str(loaded_dict['sf_LFP']) + 'Hz.csv', index=False) 
-
-    #Save TMSi:
-    external_df_offset.to_csv(saving_path + '\\External_data_' + loaded_dict['subject_ID'] + '_' + str(loaded_dict['sf_external']) + 'Hz.csv', index=False)
-    
-
-    ### PLOTS ###
-
     # Generate timescales:
     LFP_timescale_s = np.arange(0,(len(lfp_sig)/loaded_dict['sf_LFP']),(1/loaded_dict['sf_LFP']))
     external_timescale_s = np.arange(0,(len(BIP_channel)/loaded_dict['sf_external']),(1/loaded_dict['sf_external']))
@@ -155,6 +112,18 @@ def run_resync(
                                    savingpath = saving_path)
     if SHOW_FIGURES: plt.show()
     else: plt.close()
+
+    ### DETECT ARTEFACTS ###
+
+    # find artefacts in intracerebral channel
+    art_idx_LFP = artefact.find_LFP_sync_artefact(
+        lfp_sig,
+        use_kernel=loaded_dict['kernel'], 
+        consider_first_seconds_LFP=loaded_dict['consider_first_seconds_LFP']
+    )
+
+    art_time_LFP = utils.convert_index_to_time(art_idx_LFP,
+                                               loaded_dict['sf_LFP']) 
 
     # PLOT 3 : plot the intracerebral channel with its artefacts detected:
     plot.plot_channel(loaded_dict['subject_ID'], 
@@ -193,6 +162,26 @@ def run_resync(
     plt.savefig(saving_path + '\\Fig4-Intracerebral channel - first artefact detected - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
+
+    # find artefacts in external bipolar channel
+    filtered_external = preproc.filtering(BIP_channel) # preprocessing of external bipolar channel
+
+    art_idx_BIP = artefact.find_external_sync_artefact(data= filtered_external, 
+                                                       ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
+                                                       consider_first_seconds_external=loaded_dict['consider_first_seconds_external'])
+    art_time_BIP = utils.convert_index_to_time(art_idx_BIP, 
+                                               loaded_dict['sf_external'])
+
+    # crop intracerebral and external recordings 1 second before first artefact
+    (LFP_df_offset, 
+     external_df_offset) = crop.crop_rec(LFP_array, 
+                                         external_file, 
+                                         art_time_LFP, 
+                                         art_time_BIP, 
+                                         LFP_rec_ch_names, 
+                                         external_rec_ch_names, 
+                                         loaded_dict['real_index_LFP'])
+
 
     # PLOT 5 : plot the artefact adjusted by user in the intracerebral channel:
     plot.plot_channel(loaded_dict['subject_ID'], 
@@ -247,8 +236,15 @@ def run_resync(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
+    ###  SAVE CROPPED RECORDINGS ###
+    #Save LFP:
+    LFP_df_offset.to_csv(saving_path + '\\Intracerebral_LFP_' + loaded_dict['subject_ID'] + '_' + str(loaded_dict['sf_LFP']) + 'Hz.csv', index=False) 
+
+    #Save TMSi:
+    external_df_offset.to_csv(saving_path + '\\External_data_' + loaded_dict['subject_ID'] + '_' + str(loaded_dict['sf_external']) + 'Hz.csv', index=False)
+    
     print(
-        'Alignment successful! \n' 
+        'Alignment performed ! \n' 
         'Please check carefully in all figures that the samples selected \n'
         'as start of the artefact are correct, and if they are not \n'
         'please correct parameters accordingly in the config file before re-running'
@@ -408,14 +404,21 @@ def run_timeshift_analysis(
         delay_ms.append(delay[i]*1000)
     
     mean_diff = sum(delay_ms)/len(delay_ms)
+
+    timeshift = delay_ms[-1]
+
     if abs(mean_diff) > 50:
         raise ValueError(
-            'The artefacts selected might not be correct because the timeshift is very high. \n'
+            'The artefacts selected might not be correct because the mean timeshift is very high. \n'
             'Please check again Fig8 and adjust indexes in config file. \n'
-            'If an artefact is detected only in one of the recordings, do not select it.'
+            'If an artefact is detected only in one of the recordings, do not select it. \n'
+            '\n'
+            'If the artefacts selected are correct, then the recording might contain packet loss. \n'
+            f'The current timeshift is estimated to be of {timeshift}ms, \n'
+            f'while the mean timeshift is of {mean_diff}ms.'
         )
     
-    timeshift = delay_ms[-1]
+
 
     # find the time of the last artefact detected:
     last_art_time = real_art_time_LFP_offset[-1]
@@ -461,7 +464,7 @@ def run_timeshift_analysis(
     else: plt.close()
 
     print(
-        f'Timeshift analysis performed! \n'
+        f'Timeshift analysis performed ! \n'
         f'The result is: {timeshift} ms delay at the last detected artefact, \n'
         f'after a recording duration of {last_art_time}s.'
     )

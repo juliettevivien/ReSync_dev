@@ -193,7 +193,7 @@ def find_LFP_sync_artefact(
         # if NEG peak before POS then signal is inverted
         print('signal is inverted')
         signal_inverted = True
-        print(pos_idx[0], neg_idx[0])
+        #print(pos_idx[0], neg_idx[0])
         # re-check inverted for difficult cases with small pos-lfp peak before negative stim-artefact
         if (pos_idx[0] - neg_idx[0]) < 50:  # if first positive and negative are very close
             width_pos = 0
