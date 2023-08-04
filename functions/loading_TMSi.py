@@ -31,22 +31,34 @@ def load_TMSi_artefact_channel(
 	# Conversion of .Poly5 to MNE raw array
 	toMNE = True
 	TMSi_rec = TMSi_data.read_data_MNE()
-
+	external_rec_ch_names = TMSi_rec.ch_names
 	n_chan = len(TMSi_rec.ch_names)
 	time_duration_TMSi_s = (TMSi_rec.n_times/TMSi_rec.info['sfreq']).astype(float)
-	ch_t = TMSi_rec.ch_names.index(loaded_dict['ch_name_BIP'])
-	TMSi_channel = TMSi_rec.get_data()[ch_t]
-	external_rec_ch_names = TMSi_rec.ch_names
 
-	print(     
-		f'The data object has:\n\t{TMSi_rec.n_times} time samples,'      
-		f'\n\tand a sample frequency of {TMSi_rec.info["sfreq"]} Hz'      
-		f'\n\twith a recording duration of {time_duration_TMSi_s} seconds.'      
-		f'\n\t{n_chan} channels were labeled as \n{TMSi_rec.ch_names}.')
-	
-	print(f'the channel used to align datas is the channel named {TMSi_rec.ch_names[ch_t]} and has index {ch_t}')
+	if is_channel_in_list(external_rec_ch_names, loaded_dict['ch_name_BIP']):
+		ch_t = TMSi_rec.ch_names.index(loaded_dict['ch_name_BIP'])
+		TMSi_channel = TMSi_rec.get_data()[ch_t]
+		
+		print(     
+			f'The data object has:\n\t{TMSi_rec.n_times} time samples,'      
+			f'\n\tand a sample frequency of {TMSi_rec.info["sfreq"]} Hz'      
+			f'\n\twith a recording duration of {time_duration_TMSi_s} seconds.'      
+			f'\n\t{n_chan} channels were labeled as \n{TMSi_rec.ch_names}.')
+		
+		print(f'the channel used to align datas is the channel named {TMSi_rec.ch_names[ch_t]} and has index {ch_t}')
 
-	TMSi_file = TMSi_rec.get_data()
+		TMSi_file = TMSi_rec.get_data()
+
+	else:
+		raise ValueError(f'The channel does not exist in the list. Please choose a channel in the following list and write its name in the config file  {external_rec_ch_names}')
+
 
 	return TMSi_channel, TMSi_file, external_rec_ch_names
 
+
+
+def is_channel_in_list(channel_array, desired_channel_name):
+    if desired_channel_name.lower() in (channel.lower() for channel in channel_array):
+        return True
+    else:
+        return False
