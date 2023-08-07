@@ -11,20 +11,22 @@
     "real_index_LFP": 0,
     "consider_first_seconds_LFP": null,
     "consider_first_seconds_external": null,
-    "ignore_first_seconds_external": 20,
+    "ignore_first_seconds_external": 0,
     "timeshift_ignore_first_seconds_external": null,
     "index_real_artefacts_LFP": [
         0,
         1,
         2,
         3,
-        4
+        4,
+        5
     ],
     "index_real_artefacts_BIP": [
         0,
         1,
         2,
         3,
-        4
+        4,
+        5
     ]
 }
