@@ -73,7 +73,7 @@ def find_external_sync_artefact(
         stop_time = consider_first_seconds_external*loaded_dict['sf_external']
 
 
-    #start looking at each value one by one and append the timepoint to the list depending on the state and thresh_TMSiold crossed
+    #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
     for q in range(start_time,stop_time):
         if (stimON == False) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
             index_artefact_start_external.append(q)
@@ -186,7 +186,7 @@ def find_LFP_sync_artefact(
     neg_idx = find_peaks(x=-res, height=-.3 * min(res),
                         distance=loaded_dict['sf_LFP'])[0]
 
-    # check whether signal is converted
+    # check whether signal is inverted
     if neg_idx[0] < pos_idx[0]:
         # the first peak should be POSITIVE (this is for the dot-product results)
         # actual signal is first peak negative
