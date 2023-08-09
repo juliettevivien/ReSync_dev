@@ -53,57 +53,91 @@ def find_external_sync_artefact(
 
     #initialize variables (lists and state)
     index_artefact_start_external = []
-    index_artefact_stop_external = []
-    value_artefact_start_external =[]
-    value_artefact_stop_external = []
     stimON = False
 
     if loaded_dict['thresh_external'] == False:
-        thresh_BIP = -0.001
+            thresh_BIP = -0.001     
     else:
         thresh_BIP = loaded_dict['thresh_external']
 
-    start_time = 0
-    stop_time = len(data)-2
+    start_index = 0
+    stop_index = len(data)-2
 
     if ignore_first_seconds_external:
-        start_time = ignore_first_seconds_external*loaded_dict['sf_external']
+        start_index = ignore_first_seconds_external*loaded_dict['sf_external']
 
     if consider_first_seconds_external:
-        stop_time = consider_first_seconds_external*loaded_dict['sf_external']
-
+        stop_index = consider_first_seconds_external*loaded_dict['sf_external']
 
     #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
-    for q in range(start_time,stop_time):
+    for q in range(start_index,stop_index):
         if (stimON == False) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
-            index_artefact_start_external.append(q)
-            value_artefact_start_external.append(data[q])
-            stimON = True
-            q = q+1
+            if q >= 0.2*loaded_dict['sf_external']:
+                index_artefact_start_external.append(q)
+                stimON = True
+                q = q+1
+            elif q < 0.2*loaded_dict['sf_external']:
+                print ('External recording started with stim already ON. Ignoring first artefact')
+                stimON = True
+                q = q+1
         if (stimON == True) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
             if (all(data[(q+2):(q+3000)] > thresh_BIP)):
-                index_artefact_stop_external.append(q)
-                value_artefact_stop_external.append(data[q])
                 stimON = False
                 q = q+1
         else:
             q = q+1
 
     if consider_first_seconds_external:
-        for q in range(len(data)-stop_time,len(data)-2):
+        for q in range(len(data)-stop_index,len(data)-2):
             if (stimON == False) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
                 index_artefact_start_external.append(q)
-                value_artefact_start_external.append(data[q])
                 stimON = True
                 q = q+1
             if (stimON == True) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
                 if (all(data[(q+2):(q+3000)] > thresh_BIP)):
-                    index_artefact_stop_external.append(q)
-                    value_artefact_stop_external.append(data[q])
                     stimON = False
                     q = q+1
             else:
                 q = q+1
+
+    # in case the signal is inverted (i.e. stimulation artefacts are positive):
+    if len(index_artefact_start_external) == 0:
+        # if positive artefacts instead of negative ones then signal is inverted
+        #print('signal is inverted')
+        data = np.array(data) * -1
+        thresh_BIP = thresh_BIP * -1
+        #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
+        for q in range(start_index,stop_index):
+            if (stimON == False) and (data[q] >= thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
+                if q >= 0.2*loaded_dict['sf_external']:
+                    index_artefact_start_external.append(q)
+                    stimON = True
+                    q = q+1
+                elif q < 0.2*loaded_dict['sf_external']:
+                    print ('External recording started with stim already ON. Ignoring first artefact')
+                    stimON = True
+                    q = q+1
+            if (stimON == True) and (data[q] >= thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
+                if (all(data[(q+2):(q+3000)] < thresh_BIP)):
+                    stimON = False
+                    q = q+1
+            else:
+                q = q+1
+
+        if consider_first_seconds_external:
+            for q in range(len(data)-stop_index,len(data)-2):
+                if (stimON == False) and (data[q] >= thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
+                    index_artefact_start_external.append(q)
+                    stimON = True
+                    q = q+1
+                if (stimON == True) and (data[q] >= thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
+                    if (all(data[(q+2):(q+3000)] < thresh_BIP)):
+                        stimON = False
+                        q = q+1
+                else:
+                    q = q+1
+
+
 
     return index_artefact_start_external
 
