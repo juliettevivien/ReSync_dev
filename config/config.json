@@ -13,6 +13,7 @@
     "consider_first_seconds_external": null,
     "ignore_first_seconds_external": null,
     "timeshift_ignore_first_seconds_external": null,
+    "grounded" : true,
     "index_real_artefacts_LFP": [
         0,
         1,

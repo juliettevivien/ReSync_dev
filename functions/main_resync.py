@@ -164,6 +164,9 @@ def run_resync(
     else: plt.close()
 
     # find artefacts in external bipolar channel
+    if loaded_dict['grounded'] == False:
+        BIP_channel = preproc.cleaning_function(BIP_channel)
+
     filtered_external = preproc.filtering(BIP_channel) # preprocessing of external bipolar channel
 
     art_idx_BIP = artefact.find_external_sync_artefact(data= filtered_external, 
