@@ -104,14 +104,7 @@ def run_resync(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
-    # PLOT 2 : plot the signal of the channel used for artefact detection in external recording:
-    plot.plot_BIP_artefact_channel(loaded_dict['subject_ID'], 
-                                   external_timescale_s, 
-                                   BIP_channel,
-                                   'darkcyan',
-                                   savingpath = saving_path)
-    if SHOW_FIGURES: plt.show()
-    else: plt.close()
+
 
     ### DETECT ARTEFACTS ###
 
@@ -169,6 +162,16 @@ def run_resync(
 
     filtered_external = preproc.filtering(BIP_channel) # preprocessing of external bipolar channel
 
+    # PLOT 2 : plot the signal of the channel used for artefact detection in external recording:
+    plot.plot_BIP_artefact_channel(loaded_dict['subject_ID'], 
+                                   external_timescale_s, 
+                                   filtered_external,
+                                   'darkcyan',
+                                   savingpath = saving_path)
+    if SHOW_FIGURES: plt.show()
+    else: plt.close()
+
+
     art_idx_BIP = artefact.find_external_sync_artefact(data= filtered_external, 
                                                        ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
                                                        consider_first_seconds_external=loaded_dict['consider_first_seconds_external'])
@@ -208,7 +211,7 @@ def run_resync(
     # PLOT 6 : plot the external channel with its artefacts detected:
     plot.plot_channel(loaded_dict['subject_ID'], 
                       external_timescale_s, 
-                      BIP_channel, 
+                      filtered_external, 
                       'darkcyan')
     plt.ylabel('Artefact channel BIP (mV)')
     for xline in art_time_BIP:
@@ -224,7 +227,7 @@ def run_resync(
     # PLOT 7 : plot the first artefact detected in external channel for verification of sample choice:
     plot.plot_channel(loaded_dict['subject_ID'], 
                       external_timescale_s, 
-                      BIP_channel, 
+                      filtered_external, 
                       'darkcyan',
                       scatter=True)
     plt.ylabel('Artefact channel BIP - Voltage (mV)')
@@ -350,7 +353,7 @@ def run_timeshift_analysis(
     for xline in art_time_LFP_offset:
         ax1.axvline(x=xline, ymin=min(LFP_channel_offset), ymax=max(LFP_channel_offset),
                     color='black', linestyle='dashed', alpha=.3,)
-    ax2.plot(external_timescale_offset_s,BIP_channel_offset, color='darkcyan',zorder=1, linewidth=0.1) 
+    ax2.plot(external_timescale_offset_s,filtered_external_offset, color='darkcyan',zorder=1, linewidth=0.1) 
     for xline in art_time_BIP_offset:
         ax2.axvline(x=xline, color='black', linestyle='dashed', alpha=.3,)
 

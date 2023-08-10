@@ -1,25 +1,29 @@
 {
     "saving_path": "C:\\Users\\Juliette\\OneDrive\\Documents\\PhD\\Figures\\Sync analysis\\ReSync_algorithm",
-    "subject_ID": "Sub070 3MFU M1S1",
-    "sf_external": 512,
+    "subject_ID": "Sub036 18MFU M0S1",
+    "sf_external": 2048,
     "sf_LFP": 250,
-    "ch_name_BIP": "BIP 01",
+    "ch_name_BIP": "Bip25",
     "LFP_ch_index": 0,
-    "BIP_ch_index": 64,
+    "BIP_ch_index": 24,
     "kernel": "1",
-    "thresh_external": -0.0003,
+    "thresh_external": -3000,
     "real_index_LFP": 0,
-    "consider_first_seconds_LFP": null,
-    "consider_first_seconds_external": null,
+    "consider_first_seconds_LFP": 20,
+    "consider_first_seconds_external": 15,
     "ignore_first_seconds_external": null,
     "timeshift_ignore_first_seconds_external": null,
     "grounded": true,
     "index_real_artefacts_LFP": [
         0,
-        4
+        2,
+        4,
+        6
     ],
     "index_real_artefacts_BIP": [
         0,
-        4
+        1,
+        2,
+        3
     ]
 }
