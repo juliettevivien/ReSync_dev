@@ -164,8 +164,8 @@ def run_resync(
     else: plt.close()
 
     # find artefacts in external bipolar channel
-    if loaded_dict['grounded'] == False:
-        BIP_channel = preproc.cleaning_function(BIP_channel)
+    #if loaded_dict['grounded'] == False:
+        #BIP_channel = preproc.cleaning_function(BIP_channel)
 
     filtered_external = preproc.filtering(BIP_channel) # preprocessing of external bipolar channel
 
@@ -369,12 +369,14 @@ def run_timeshift_analysis(
     if len(loaded_dict['index_real_artefacts_LFP']) > len(art_time_LFP_offset):
         raise ValueError(
             'Indexes incorrect for intracerebral recording. \n'
+            f'LFP contains {len(art_time_LFP_offset)} artefacts. \n'
             'Please check Fig8 to find the real indexes of detected artefacts, \n'
             'and change config file accordingly'
         )
     if len(loaded_dict['index_real_artefacts_BIP']) > len(art_time_BIP_offset):
         raise ValueError(
             'Indexes incorrect for external recording. \n'
+            f'external recording contains {len(art_time_BIP_offset)} artefacts. \n'
             'Please check Fig8 to find the real indexes of detected artefacts, \n'
             'and change config file accordingly'
         )
@@ -384,6 +386,8 @@ def run_timeshift_analysis(
             'Please check Fig8 to find the real indexes of detected artefacts, \n'
             'and change config file accordingly. \n'
             'If an artefact is detected only in one of the recordings, do not select it.'
+            f'LFP contains {len(art_time_LFP_offset)} artefacts. \n'
+            f'external recording contains {len(art_time_BIP_offset)} artefacts. \n'
         )
 
     
@@ -412,13 +416,12 @@ def run_timeshift_analysis(
 
     if abs(mean_diff) > 50:
         raise ValueError(
-            'The artefacts selected might not be correct because the mean timeshift is very high. \n'
+            f'The artefacts selected might not be correct because the mean timeshift is very high: {mean_diff}ms \n'
             'Please check again Fig8 and adjust indexes in config file. \n'
             'If an artefact is detected only in one of the recordings, do not select it. \n'
-            '\n'
+            f'LFP contains {len(art_time_LFP_offset)} artefacts, and external recording contains {len(art_time_BIP_offset)} artefacts. \n'            
             'If the artefacts selected are correct, then the recording might contain packet loss. \n'
-            f'The current timeshift is estimated to be of {timeshift}ms, \n'
-            f'while the mean timeshift is of {mean_diff}ms.'
+            f'The current timeshift is estimated to be of {timeshift}ms. \n'
         )
     
 

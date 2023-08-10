@@ -81,7 +81,7 @@ def find_external_sync_artefact(
                 stimON = True
                 q = q+1
         if (stimON == True) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
-            if (all(data[(q+2):(q+3000)] > thresh_BIP)):
+            if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] > thresh_BIP)):
                 stimON = False
                 q = q+1
         else:
@@ -94,7 +94,7 @@ def find_external_sync_artefact(
                 stimON = True
                 q = q+1
             if (stimON == True) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
-                if (all(data[(q+2):(q+3000)] > thresh_BIP)):
+                if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] > thresh_BIP)):
                     stimON = False
                     q = q+1
             else:
@@ -118,7 +118,7 @@ def find_external_sync_artefact(
                     stimON = True
                     q = q+1
             if (stimON == True) and (data[q] >= thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
-                if (all(data[(q+2):(q+3000)] < thresh_BIP)):
+                if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] < thresh_BIP)):
                     stimON = False
                     q = q+1
             else:
@@ -131,7 +131,7 @@ def find_external_sync_artefact(
                     stimON = True
                     q = q+1
                 if (stimON == True) and (data[q] >= thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
-                    if (all(data[(q+2):(q+3000)] < thresh_BIP)):
+                    if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] < thresh_BIP)):
                         stimON = False
                         q = q+1
                 else:
