@@ -236,7 +236,7 @@ def run_resync(
                     color='black', 
                     linestyle='dashed', 
                     alpha=.3,)
-    plt.xlim(art_time_BIP[0]-0.015, art_time_BIP[0]+0.015)
+    plt.xlim(art_time_BIP[0]-(60/loaded_dict['sf_external']), art_time_BIP[0]+(60/loaded_dict['sf_external']))
     plt.gcf()
     plt.savefig(saving_path + '\\Fig7-External bipolar channel - first artefact detected.png',bbox_inches='tight')   
     if SHOW_FIGURES: plt.show()
@@ -324,7 +324,7 @@ def run_timeshift_analysis(
 
     # find artefacts again in cropped external bipolar channel:
     art_idx_BIP_offset = artefact.find_external_sync_artefact(data = filtered_external_offset, 
-                                                              ignore_first_seconds_external=loaded_dict['timeshift_ignore_first_seconds_external'], 
+                                                              ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
                                                               consider_first_seconds_external=loaded_dict['consider_first_seconds_external']
     )
     art_time_BIP_offset = utils.convert_index_to_time(art_idx_BIP_offset, 
@@ -417,7 +417,7 @@ def run_timeshift_analysis(
 
     timeshift = delay_ms[-1]
 
-    if abs(mean_diff) > 50:
+    if abs(mean_diff) > 100:
         raise ValueError(
             f'The artefacts selected might not be correct because the mean timeshift is very high: {mean_diff}ms \n'
             'Please check again Fig8 and adjust indexes in config file. \n'
@@ -427,7 +427,6 @@ def run_timeshift_analysis(
             f'The current timeshift is estimated to be of {timeshift}ms. \n'
         )
     
-
 
     # find the time of the last artefact detected:
     last_art_time = real_art_time_LFP_offset[-1]

@@ -56,7 +56,7 @@ def find_external_sync_artefact(
     stimON = False
 
     if loaded_dict['thresh_external'] == False:
-            thresh_BIP = -0.001     
+            thresh_BIP = -0.001     #default threshold, works with TMSi SAGA sampling at 4000Hz 
     else:
         thresh_BIP = loaded_dict['thresh_external']
 
@@ -69,6 +69,13 @@ def find_external_sync_artefact(
     if consider_first_seconds_external:
         stop_index = consider_first_seconds_external*loaded_dict['sf_external']
 
+    #check polarity of artefacts before detection:
+    if loaded_dict['artefacts_external_downward'] == False:
+        if np.mean(data) > -0.1:
+            print('external signal is reversed')
+            data = data * -1
+
+    print(f'{np.mean(data)}')
     #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
     for q in range(start_index,stop_index):
         if (stimON == False) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
@@ -99,44 +106,6 @@ def find_external_sync_artefact(
                     q = q+1
             else:
                 q = q+1
-
-    # in case the signal is inverted (i.e. stimulation artefacts are positive):
-    if len(index_artefact_start_external) == 0:
-
-        # if positive artefacts instead of negative ones then signal is inverted
-        #print('signal is inverted')
-        thresh_BIP = thresh_BIP * -1
-        #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
-        for q in range(start_index,stop_index):
-            if (stimON == False) and (data[q] > thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
-                if q >= 0.2*loaded_dict['sf_external']:
-                    index_artefact_start_external.append(q)
-                    stimON = True
-                    q = q+1
-                elif q < 0.2*loaded_dict['sf_external']:
-                    print ('External recording probably started with stim already ON. Ignoring first artefact')
-                    stimON = True
-                    q = q+1
-            if (stimON == True) and (data[q] > thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
-                if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] < thresh_BIP)):
-                    stimON = False
-                    q = q+1
-            else:
-                q = q+1
-
-        if consider_first_seconds_external:
-            for q in range(len(data)-stop_index,len(data)-2):
-                if (stimON == False) and (data[q] > thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
-                    index_artefact_start_external.append(q)
-                    stimON = True
-                    q = q+1
-                if (stimON == True) and (data[q] > thresh_BIP) and (data[q] > data[q+1]) and (data[q] > data[q-1]):
-                    if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] < thresh_BIP)):
-                        stimON = False
-                        q = q+1
-                else:
-                    q = q+1
-
 
 
     return index_artefact_start_external
