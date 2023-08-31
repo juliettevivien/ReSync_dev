@@ -9,10 +9,10 @@ def load_TMSi_artefact_channel(
 ):
     
 	"""
-	Function that takes a poly5 object and returns in an array 
-	the channel which will be used for sync ("BIP 01" in our settings),
-	and in another array the timescale in milliseconds of the TMSi recording.
-    It also prints informations about the recording (duration, channels, sampling frequency,...)
+	Function that takes a poly5 object and returns in an array the channel 
+	which will be used for sync ("BIP 01" in our settings),	and in another 
+	array the timescale in milliseconds of the TMSi recording. It also prints 
+	information about the recording (duration, channels, sampling frequency,...)
 	
 	Input:
 		- TMSi_data : TMSiFileFormats.file_readers.poly5reader.Poly5Reader

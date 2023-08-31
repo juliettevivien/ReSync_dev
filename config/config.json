@@ -1,14 +1,14 @@
 {
-    "saving_path": "C:\\Users\\Juliette\\OneDrive\\Documents\\PhD\\Figures\\Sync analysis\\ReSync_grouped\\ReSync_group_1",
-    "subject_ID": "Sub019 24MFU M0S0 FT",
-    "sf_external": 4000,
+    "saving_path": "C:\\Users\\Juliette\\OneDrive\\Documents\\PhD\\Figures\\Sync analysis\\ReSync_grouped\\ReSync_group_4",
+    "subject_ID": "Sub033 24MFU M0S1",
+    "sf_external": 4096,
     "sf_LFP": 250,
-    "ch_name_BIP": "BIP 02",
+    "ch_name_BIP": "BIP 01",
     "LFP_ch_index": 0,
-    "BIP_ch_index": 1,
+    "BIP_ch_index": 39,
     "kernel": "2",
     "thresh_external": -0.001,
-    "real_index_LFP": 1,
+    "real_index_LFP": 3,
     "consider_first_seconds_LFP": null,
     "consider_first_seconds_external": null,
     "ignore_first_seconds_external": null,
@@ -17,15 +17,13 @@
     "index_real_artefacts_LFP": [
         0,
         2,
-        4,
-        7,
-        9
+        6,
+        8
     ],
     "index_real_artefacts_BIP": [
         0,
-        2,
         1,
-        4,
-        5
+        3,
+        4
     ]
 }

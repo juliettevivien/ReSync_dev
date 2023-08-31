@@ -8,8 +8,12 @@ from tkinter.filedialog import askdirectory
 
 
 
-
 def define_folders():
+
+    """
+    This function is used if the user hasn't already define 
+    the saving path in the config.json file (back up function).
+    """
 
     #import settings
     json_path = os.path.join(os.getcwd(), 'config')
@@ -37,7 +41,8 @@ def convert_index_to_time(
     sf: int,
     milliseconds = False
 ):
-    """ Function to calculate timestamps 
+    """ 
+    Function to calculate timestamps 
     of indexes from a list
     
     Inputs:
@@ -48,7 +53,6 @@ def convert_index_to_time(
     
     Returns:
         - art_time : list of timestamps
-    
     """
 
     art_time = []
@@ -71,7 +75,8 @@ def convert_time_to_index(
     milliseconds = False
 ):
     
-    """ Function to calculate indexes from a list of timestamps.
+    """ 
+    Function to calculate indexes from a list of timestamps.
     
     Inputs:
         - art_time : list of timestamps
@@ -80,8 +85,7 @@ def convert_time_to_index(
         - milliseconds : True/False, default is False
             
     Returns:
-        - art_idx : list of indexes
-    
+        - art_idx : list of indexes    
     """
 
     art_idx = []

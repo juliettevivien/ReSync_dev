@@ -432,7 +432,7 @@ def run_timeshift_analysis(
     last_art_time = real_art_time_LFP_offset[-1]
 
 
-    ## PLOTING ##
+    ## PLOTTING ##
 
     # PLOT 9: All artefacts detected and their associated timeshift
     plt.figure(figsize=(30, 10))

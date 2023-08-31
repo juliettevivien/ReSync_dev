@@ -15,7 +15,7 @@ def plot_LFP_artefact_channel(
 ):
 
     """
-    Function that plots the selected channel for quick visualization (and saving).
+    Function that plots the selected intracerebral channel for quick visualization (and saving).
 
     Input:
         - sub: the subject ID
@@ -24,9 +24,7 @@ def plot_LFP_artefact_channel(
         - color: the color of the signal on the plot
         - savingpath: the folder where the plot has to be saved
         - saving_folder: Boolean, default = True, plots are automatically saved
-    
-    Returns:
-        - the plotted signal
+
     """
 
     figure(figsize=(12, 6), dpi=80)
@@ -53,7 +51,7 @@ def plot_BIP_artefact_channel(
 ):
 
     """
-    Function that plots the TMSi channel for quick visualization (and saving).
+    Function that plots the external bipolar channel for quick visualization (and saving).
 
     Input:
         - sub: the subject ID
@@ -62,9 +60,6 @@ def plot_BIP_artefact_channel(
         - color: the color of the signal on the plot
         - savingpath: the folder where the plot has to be saved
         - saving_folder: Boolean, default = True, plots automatically saved
-    
-    Returns:
-        - the plotted signal
     """
 
     figure(figsize=(12, 6), dpi=80)

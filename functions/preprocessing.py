@@ -9,8 +9,10 @@ def cleaning_function(
 ):
     
     """ 
-    Function that removes "clipping" artefacts, 
-    i.e. saturation of amplifier due to cable strain. 
+    !!! TO BE REMOVED IN FINAL VERSION !!! 
+    (not necessary anymore with proper grounding)
+    
+    Function that removes "clipping" artefacts.
     It calculates the mean of the signal and replaces 
     every higher value by the mean. This function can
     only be used if the stim artefact has a specific 
