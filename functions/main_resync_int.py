@@ -1,6 +1,7 @@
 # import librairies
 import matplotlib
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import numpy as np
 import os
 import json
@@ -11,6 +12,7 @@ import functions.find_artefacts as artefact
 import functions.plotting as plot
 import functions.crop as crop
 import functions.preprocessing as preproc
+import functions.plotting_interactive as plot_interact
 
 ## set font sizes and other parameters for the figures
 SMALL_SIZE = 12
@@ -338,7 +340,7 @@ def run_timeshift_analysis(
     LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/loaded_dict['sf_LFP']),1/loaded_dict['sf_LFP'])
     external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/loaded_dict['sf_external']),1/loaded_dict['sf_external'])
 
-    # PLOT 8: Both signals aligned with all their artefacts detected:
+    # PLOT 1: Both signals aligned with all their artefacts detected:
     fig, (ax1, ax2) = plt.subplots(2,1)
     fig.suptitle(str(loaded_dict['subject_ID']))
     fig.set_figheight(6)
@@ -393,14 +395,35 @@ def run_timeshift_analysis(
             f'external recording contains {len(art_time_BIP_offset)} artefacts. \n'
         )
 
-    
+    def ask_yes_no_question(question):
+        while True:
+            user_input = input(f"{question} (yes/no): ").strip().lower()
+            if user_input in ('yes', 'y'):
+                return True
+            elif user_input in ('no', 'n'):
+                return False
+            else:
+                print("Please enter 'yes' or 'no'.")
 
-    real_art_time_LFP_offset= utils.extract_elements(art_time_LFP_offset,
-                                                     loaded_dict['index_real_artefacts_LFP']
-    ) 
-    real_art_time_BIP_offset= utils.extract_elements(art_time_BIP_offset, 
-                                                     loaded_dict['index_real_artefacts_BIP']
-    )
+
+
+
+    if ask_yes_no_question("Is manual selection of last artefact necessary?"):
+        print("User chose 'yes'.")
+        #PLOT THAT NEEDS TO BE INTERACTIVE:
+        last_artefact_LFP = plot_interact.select_point(LFP_timescale_offset_s,LFP_channel_offset)
+        real_art_time_LFP_offset=last_artefact_LFP
+       
+    
+    else:
+        real_art_time_LFP_offset= utils.extract_elements(art_time_LFP_offset,
+                                                        loaded_dict['index_real_artefacts_LFP']
+        ) 
+        real_art_time_BIP_offset= utils.extract_elements(art_time_BIP_offset, 
+                                                        loaded_dict['index_real_artefacts_BIP']
+        )
+
+
 
 
     ### ASSESS TIMESHIFT ###
