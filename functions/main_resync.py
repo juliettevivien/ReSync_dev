@@ -11,6 +11,7 @@ import functions.find_artefacts as artefact
 import functions.plotting as plot
 import functions.crop as crop
 import functions.preprocessing as preproc
+import functions.find_packet_loss as pkl
 
 ## set font sizes and other parameters for the figures
 SMALL_SIZE = 12
@@ -156,9 +157,7 @@ def run_resync(
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
-    # find artefacts in external bipolar channel
-    #if loaded_dict['grounded'] == False:
-        #BIP_channel = preproc.cleaning_function(BIP_channel)
+    # find artefacts in external bipolar channel:
 
     filtered_external = preproc.filtering(BIP_channel) # preprocessing of external bipolar channel
 
@@ -347,9 +346,11 @@ def run_timeshift_analysis(
     ax2.set_xlabel('Time (s)')
     ax1.set_ylabel('Intracerebral LFP channel (µV)')
     ax2.set_ylabel('External bipolar channel (mV)')
-    ax1.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
-    ax2.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
-    ax1.plot(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, linewidth=0.3)
+    #ax1.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
+    #ax2.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
+    ax1.set_xlim(143.6,144.2) 
+    ax2.set_xlim(143.6,144.2) 
+    ax1.scatter(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, s=5,linewidth=0.3)
     for xline in art_time_LFP_offset:
         ax1.axvline(x=xline, ymin=min(LFP_channel_offset), ymax=max(LFP_channel_offset),
                     color='black', linestyle='dashed', alpha=.3,)
@@ -450,8 +451,8 @@ def run_timeshift_analysis(
         ax1.set_ylabel('Intracerebral LFP channel (µV)')
         ax2.set_ylabel('External bipolar channel (mV)')
         ax1.set_title('artefact ' + str((loaded_dict['index_real_artefacts_LFP'][n])+1))
-        ax1.set_xlim((real_art_time_LFP_offset[n]-0.050),(real_art_time_LFP_offset[n]+0.1))
-        ax2.set_xlim((real_art_time_LFP_offset[n]-0.050),(real_art_time_LFP_offset[n]+0.1))
+        ax1.set_xlim((real_art_time_BIP_offset[n]-0.050),(real_art_time_BIP_offset[n]+0.1))
+        ax2.set_xlim((real_art_time_BIP_offset[n]-0.050),(real_art_time_BIP_offset[n]+0.1))
         ax1.plot(LFP_timescale_offset_s,LFP_channel_offset,color='peachpuff',zorder=1)
         ax1.scatter(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',s=4,zorder=2) 
         ax1.scatter(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',s=4,zorder=2) 
@@ -476,3 +477,82 @@ def run_timeshift_analysis(
         f'The result is: {timeshift} ms delay at the last detected artefact, \n'
         f'after a recording duration of {last_art_time}s.'
     )
+
+
+
+
+def check_packet_loss(
+        json_fname: str,
+        sub: str
+):
+    
+    j = pkl.load_sourceJSON(sub, json_fname)
+
+    prc_data_codes = {
+        'signal_test': 'CalibrationTests',
+        'streaming': 'BrainSenseTimeDomain',
+        'survey': 'LfpMontageTimeDomain',
+        'indef_streaming': 'IndefiniteStreaming'
+    }
+
+    mod = 'streaming'
+    list_of_streamings = j[prc_data_codes[mod]]
+
+    for i_dat, dat in enumerate(list_of_streamings):
+        print(i_dat)
+        new_lfp = pkl.check_missings_in_lfp(dat)
+
+
+
+
+
+def ecg(
+        LFP_df_offset, 
+        external_df_offset,
+        SHOW_FIGURES = True
+):
+    
+    #import settings
+    json_path = os.path.join(os.getcwd(), 'config')
+    json_filename = 'config.json'  # dont forget json extension
+    with open(os.path.join(json_path, json_filename), 'r') as f:
+        loaded_dict =  json.load(f)
+
+    #set saving path
+    if loaded_dict['saving_path'] == False:
+        saving_path = utils.define_folders()
+    else:
+        saving_path = os.path.join(os.path.normpath(loaded_dict['saving_path']), loaded_dict['subject_ID'])
+        if not os.path.isdir(saving_path):
+            os.makedirs(saving_path)
+
+
+    # Reselect artefact channels in the aligned (= cropped) files
+    LFP_channel_offset = LFP_df_offset.iloc[:,loaded_dict['LFP_ch_index']].to_numpy()  
+    BIP_channel_offset = external_df_offset.iloc[:,loaded_dict['BIP_ch_index']].to_numpy() 
+
+    # pre-processing of external bipolar channel before searching artefacts:
+    filtered_external_offset = preproc.filtering(BIP_channel_offset)
+
+    # Generate new timescales:
+    LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/loaded_dict['sf_LFP']),1/loaded_dict['sf_LFP'])
+    external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/loaded_dict['sf_external']),1/loaded_dict['sf_external'])
+
+    #make plot on beginning of recordings:
+    fig, (ax1, ax2) = plt.subplots(2,1)
+    fig.suptitle(str(loaded_dict['subject_ID']))
+    fig.set_figheight(6)
+    fig.set_figwidth(12)
+    ax1.axes.xaxis.set_ticklabels([])
+    ax2.set_xlabel('Time (s)')
+    ax1.set_ylabel('Intracerebral LFP channel (µV)')
+    ax2.set_ylabel('External bipolar channel (mV)')
+    ax1.set_xlim(2.5,4.5) 
+    ax2.set_xlim(2.5,4.5)
+    ax1.set_ylim(-100,100) 
+    ax2.set_ylim(-0.0165,-0.016) 
+    ax1.plot(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, linewidth=1)
+    ax2.plot(external_timescale_offset_s,BIP_channel_offset, color='darkcyan',zorder=1, linewidth=1) 
+    fig.savefig(saving_path + '\\Fig_ECG.png',bbox_inches='tight')
+    if SHOW_FIGURES: plt.show()
+    else: plt.close()

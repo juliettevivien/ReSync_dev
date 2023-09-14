@@ -69,13 +69,14 @@ def find_external_sync_artefact(
     if consider_first_seconds_external:
         stop_index = consider_first_seconds_external*loaded_dict['sf_external']
 
-    #check polarity of artefacts before detection:
-    if loaded_dict['artefacts_external_downward'] == False:
-        if np.mean(data) > -0.1:
-            print('external signal is reversed')
-            data = data * -1
+    # check polarity of artefacts before detection:
+    # to be properly detected in external channel, artefacts have to look like a downward deflection 
+    # (they are more negative than positive). If for some reason the data recorder picks up
+    # the artefact as an upward deflection instead, then the signal has to be inverted before detecting artefacts.
+    if abs(max(data))>abs(min(data)):
+        print('external signal is reversed')
+        data = data * -1
 
-    print(f'{np.mean(data)}')
     #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
     for q in range(start_index,stop_index):
         if (stimON == False) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
