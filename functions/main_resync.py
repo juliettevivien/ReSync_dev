@@ -286,6 +286,8 @@ def run_timeshift_analysis(
         aligned recordings
     """
 
+    plt.rcParams['svg.fonttype'] = 'none'
+
     #import settings
     json_path = os.path.join(os.getcwd(), 'config')
     json_filename = 'config.json'  # dont forget json extension
@@ -346,19 +348,19 @@ def run_timeshift_analysis(
     ax2.set_xlabel('Time (s)')
     ax1.set_ylabel('Intracerebral LFP channel (µV)')
     ax2.set_ylabel('External bipolar channel (mV)')
-    #ax1.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
-    #ax2.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
-    ax1.set_xlim(143.6,144.2) 
-    ax2.set_xlim(143.6,144.2) 
-    ax1.scatter(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, s=5,linewidth=0.3)
+    ax1.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
+    ax2.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
+    #ax1.set_xlim(143.6,144.2) 
+    #ax2.set_xlim(143.6,144.2) 
+    ax1.plot(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, linewidth=0.3)
     for xline in art_time_LFP_offset:
         ax1.axvline(x=xline, ymin=min(LFP_channel_offset), ymax=max(LFP_channel_offset),
                     color='black', linestyle='dashed', alpha=.3,)
-    ax2.plot(external_timescale_offset_s,filtered_external_offset, color='darkcyan',zorder=1, linewidth=0.1) 
+    ax2.plot(external_timescale_offset_s,filtered_external_offset, color='darkcyan',zorder=1, linewidth=0.05) 
     for xline in art_time_BIP_offset:
         ax2.axvline(x=xline, color='black', linestyle='dashed', alpha=.3,)
 
-    fig.savefig(saving_path + '\\Fig8-Intracerebral and external recordings aligned with artefacts detected.png',bbox_inches='tight')
+    fig.savefig(saving_path + '\\Fig8-Intracerebral and external recordings aligned with artefacts detected.svg',bbox_inches='tight', dpi=1200)
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -459,8 +461,8 @@ def run_timeshift_analysis(
         for xline in real_art_time_LFP_offset:
             ax1.axvline(x=xline, ymin=min(LFP_channel_offset), ymax=max(LFP_channel_offset),
                 color='black', linestyle='dashed', alpha=.3,)
-        ax2.plot(external_timescale_offset_s,BIP_channel_offset, color='paleturquoise',zorder=1) 
-        ax2.scatter(external_timescale_offset_s,BIP_channel_offset, color='darkcyan',s=4,zorder=2)
+        ax2.plot(external_timescale_offset_s,filtered_external_offset, color='paleturquoise',zorder=1) 
+        ax2.scatter(external_timescale_offset_s,filtered_external_offset, color='darkcyan',s=4,zorder=2)
         for xline in real_art_time_BIP_offset:
             ax2.axvline(x=xline, color='black', linestyle='dashed', alpha=.3,)
 
@@ -468,7 +470,7 @@ def run_timeshift_analysis(
         ax1.text(0.05,0.85,s='delay intra/exter: ' +str(round(delay_ms[n],2))+ 'ms',fontsize=14,transform=ax1.transAxes)
 
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig9-Intracerebral and external aligned channels - timeshift all artefacts.png',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig9-Intracerebral and external aligned channels - timeshift all artefacts.svg',bbox_inches='tight')
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
