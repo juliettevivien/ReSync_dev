@@ -34,9 +34,11 @@ def run_resync(
     LFP_array, 
     lfp_sig, 
     LFP_rec_ch_names, 
+    sf_LFP,
     external_file,
     BIP_channel, 
     external_rec_ch_names,
+    sf_external,
     SHOW_FIGURES = True,
 ):
 
@@ -94,8 +96,8 @@ def run_resync(
             os.makedirs(saving_path)
 
     # Generate timescales:
-    LFP_timescale_s = np.arange(0,(len(lfp_sig)/loaded_dict['sf_LFP']),(1/loaded_dict['sf_LFP']))
-    external_timescale_s = np.arange(0,(len(BIP_channel)/loaded_dict['sf_external']),(1/loaded_dict['sf_external']))
+    LFP_timescale_s = np.arange(0,(len(lfp_sig)/sf_LFP),(1/sf_LFP))
+    external_timescale_s = np.arange(0,(len(BIP_channel)/sf_external),(1/sf_external))
 
     # PLOT 1 : plot the signal of the channel used for artefact detection in intracerebral recording:
     plot.plot_LFP_artefact_channel(loaded_dict['subject_ID'], 
@@ -112,18 +114,19 @@ def run_resync(
     # find artefacts in intracerebral channel
     art_idx_LFP = artefact.find_LFP_sync_artefact(
         lfp_sig,
+        sf_LFP,
         use_kernel=loaded_dict['kernel'], 
         consider_first_seconds_LFP=loaded_dict['consider_first_seconds_LFP']
     )
 
     art_time_LFP = utils.convert_index_to_time(art_idx_LFP,
-                                               loaded_dict['sf_LFP']) 
+                                               sf_LFP) 
 
     # PLOT 3 : plot the intracerebral channel with its artefacts detected:
     plot.plot_channel(loaded_dict['subject_ID'], 
                       LFP_timescale_s, 
                       lfp_sig,
-                      'darkorange')
+                      'darkorange',scatter=True)
     plt.ylabel('Intracerebral LFP channel (µV)')
     for xline in art_time_LFP:
         plt.axvline(x=xline, 
@@ -172,12 +175,15 @@ def run_resync(
 
 
     art_idx_BIP = artefact.find_external_sync_artefact(data= filtered_external, 
+                                                       sf_external = sf_external,
                                                        ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
                                                        consider_first_seconds_external=loaded_dict['consider_first_seconds_external'])
+    
+    
     art_time_BIP = utils.convert_index_to_time(art_idx_BIP, 
-                                               loaded_dict['sf_external'])
+                                               sf_external)
 
-    # crop intracerebral and external recordings 1 second before first artefact
+     # crop intracerebral and external recordings 1 second before first artefact
     (LFP_df_offset, 
      external_df_offset) = crop.crop_rec(LFP_array, 
                                          external_file, 
@@ -185,7 +191,9 @@ def run_resync(
                                          art_time_BIP, 
                                          LFP_rec_ch_names, 
                                          external_rec_ch_names, 
-                                         loaded_dict['real_index_LFP'])
+                                         loaded_dict['real_index_LFP'],
+                                         sf_LFP,
+                                         sf_external)
 
 
     # PLOT 5 : plot the artefact adjusted by user in the intracerebral channel:
@@ -195,7 +203,7 @@ def run_resync(
                       scatter=True)
     plt.ylabel('Intracerebral LFP channel (µV)')
     for xline in art_time_LFP:
-        plt.axvline(x=xline+(loaded_dict['real_index_LFP']/loaded_dict['sf_LFP']), 
+        plt.axvline(x=xline+(loaded_dict['real_index_LFP']/sf_LFP), 
                     ymin=min(lfp_sig), 
                     ymax=max(lfp_sig), 
                     color='black', 
@@ -235,7 +243,7 @@ def run_resync(
                     color='black', 
                     linestyle='dashed', 
                     alpha=.3,)
-    plt.xlim(art_time_BIP[0]-(60/loaded_dict['sf_external']), art_time_BIP[0]+(60/loaded_dict['sf_external']))
+    plt.xlim(art_time_BIP[0]-(60/sf_external), art_time_BIP[0]+(60/sf_external))
     plt.gcf()
     plt.savefig(saving_path + '\\Fig7-External bipolar channel - first artefact detected.png',bbox_inches='tight')   
     if SHOW_FIGURES: plt.show()
@@ -243,10 +251,10 @@ def run_resync(
 
     ###  SAVE CROPPED RECORDINGS ###
     #Save LFP:
-    LFP_df_offset.to_csv(saving_path + '\\Intracerebral_LFP_' + loaded_dict['subject_ID'] + '_' + str(loaded_dict['sf_LFP']) + 'Hz.csv', index=False) 
+    LFP_df_offset.to_csv(saving_path + '\\Intracerebral_LFP_' + loaded_dict['subject_ID'] + '_' + str(sf_LFP) + 'Hz.csv', index=False) 
 
     #Save TMSi:
-    external_df_offset.to_csv(saving_path + '\\External_data_' + loaded_dict['subject_ID'] + '_' + str(loaded_dict['sf_external']) + 'Hz.csv', index=False)
+    external_df_offset.to_csv(saving_path + '\\External_data_' + loaded_dict['subject_ID'] + '_' + str(sf_external) + 'Hz.csv', index=False)
     
     print(
         'Alignment performed ! \n' 
@@ -261,7 +269,9 @@ def run_resync(
 
 def run_timeshift_analysis(
         LFP_df_offset, 
+        sf_LFP,
         external_df_offset,
+        sf_external,
         SHOW_FIGURES = True
 ):
     
@@ -312,12 +322,13 @@ def run_timeshift_analysis(
 
     # find artefacts again in cropped intracerebral LFP channel:
     art_idx_LFP_offset = artefact.find_LFP_sync_artefact(lfp_data=LFP_channel_offset,
+                                                         sf_LFP=sf_LFP,
                                                          use_kernel=loaded_dict['kernel'],
                                                          consider_first_seconds_LFP=loaded_dict['consider_first_seconds_LFP']
     )
 
     art_time_LFP_offset = utils.convert_index_to_time(art_idx_LFP_offset,
-                                                      loaded_dict['sf_LFP']
+                                                      sf_LFP
     )
 
     # pre-processing of external bipolar channel before searching artefacts:
@@ -325,19 +336,20 @@ def run_timeshift_analysis(
 
     # find artefacts again in cropped external bipolar channel:
     art_idx_BIP_offset = artefact.find_external_sync_artefact(data = filtered_external_offset, 
+                                                              sf_external = sf_external,
                                                               ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
                                                               consider_first_seconds_external=loaded_dict['consider_first_seconds_external']
     )
     art_time_BIP_offset = utils.convert_index_to_time(art_idx_BIP_offset, 
-                                                      loaded_dict['sf_external']
+                                                      sf_external
     )
 
 
     ## PLOTTING ##
 
     # Generate new timescales:
-    LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/loaded_dict['sf_LFP']),1/loaded_dict['sf_LFP'])
-    external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/loaded_dict['sf_external']),1/loaded_dict['sf_external'])
+    LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/sf_LFP),1/sf_LFP)
+    external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/sf_external),1/sf_external)
 
     # PLOT 8: Both signals aligned with all their artefacts detected:
     fig, (ax1, ax2) = plt.subplots(2,1)
@@ -348,8 +360,8 @@ def run_timeshift_analysis(
     ax2.set_xlabel('Time (s)')
     ax1.set_ylabel('Intracerebral LFP channel (µV)')
     ax2.set_ylabel('External bipolar channel (mV)')
-    ax1.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
-    ax2.set_xlim(0,len(LFP_channel_offset)/loaded_dict['sf_LFP']) 
+    ax1.set_xlim(0,len(LFP_channel_offset)/sf_LFP) 
+    ax2.set_xlim(0,len(LFP_channel_offset)/sf_LFP) 
     #ax1.set_xlim(143.6,144.2) 
     #ax2.set_xlim(143.6,144.2) 
     ax1.plot(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, linewidth=0.3)
@@ -470,7 +482,7 @@ def run_timeshift_analysis(
         ax1.text(0.05,0.85,s='delay intra/exter: ' +str(round(delay_ms[n],2))+ 'ms',fontsize=14,transform=ax1.transAxes)
 
     plt.gcf()
-    plt.savefig(saving_path + '\\Fig9-Intracerebral and external aligned channels - timeshift all artefacts.svg',bbox_inches='tight')
+    plt.savefig(saving_path + '\\Fig9-Intracerebral and external aligned channels-timeshift all artefacts.pdf',bbox_inches='tight', dpi=1200)
     if SHOW_FIGURES: plt.show()
     else: plt.close()
 
@@ -510,7 +522,9 @@ def check_packet_loss(
 
 def ecg(
         LFP_df_offset, 
+        sf_LFP,
         external_df_offset,
+        sf_external,
         SHOW_FIGURES = True
 ):
     
@@ -537,8 +551,8 @@ def ecg(
     filtered_external_offset = preproc.filtering(BIP_channel_offset)
 
     # Generate new timescales:
-    LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/loaded_dict['sf_LFP']),1/loaded_dict['sf_LFP'])
-    external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/loaded_dict['sf_external']),1/loaded_dict['sf_external'])
+    LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/sf_LFP),1/sf_LFP)
+    external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/sf_external),1/sf_external)
 
     #make plot on beginning of recordings:
     fig, (ax1, ax2) = plt.subplots(2,1)

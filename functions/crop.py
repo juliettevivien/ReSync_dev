@@ -10,7 +10,9 @@ def crop_rec(
     art_time_BIP,
     LFP_rec_ch_names: list,
     external_rec_ch_names: list,
-    real_index_LFP: list
+    real_index_LFP: list,
+    sf_LFP,
+    sf_external
 ):
 
     """
@@ -53,7 +55,7 @@ def crop_rec(
     # Crop beginning of LFP recording 1 second before first artefact:
 
     time_start_LFP_0 = art_time_LFP[0]-1 # 1s before first artefact
-    index_start_LFP_0 = time_start_LFP_0*(loaded_dict['sf_LFP'])
+    index_start_LFP_0 = time_start_LFP_0*(sf_LFP)
     index_start_LFP = index_start_LFP_0 + real_index_LFP ## adjust index for proper alignement
 
     LFP_df = pd.DataFrame(LFP_array) # convert np.ndarray to dataframe
@@ -68,7 +70,7 @@ def crop_rec(
 
     # find the index of the row corresponding to 1 second before first artefact
     time_start_external = (art_time_BIP[0])-1
-    index_start_external = time_start_external*loaded_dict['sf_external']
+    index_start_external = time_start_external*sf_external
 
     external_array = external_file
     external_df = pd.DataFrame(external_array) # convert np.ndarray to dataframe
@@ -78,17 +80,17 @@ def crop_rec(
     external_df_offset = external_df_offset.reset_index(drop=True) # reset indexes
 
     #### Check which recording is the longest, and crop it to give it the same duration as the other one:
-    LFP_rec_duration = len(LFP_df_offset)/loaded_dict['sf_LFP']
-    external_rec_duration = len(external_df_offset)/loaded_dict['sf_external']
+    LFP_rec_duration = len(LFP_df_offset)/sf_LFP
+    external_rec_duration = len(external_df_offset)/sf_external
 
     if LFP_rec_duration > external_rec_duration:
         rec_duration = external_rec_duration
-        index_stop_LFP = rec_duration*loaded_dict['sf_LFP']
+        index_stop_LFP = rec_duration*sf_LFP
         LFP_df_offset2 = LFP_df_offset.truncate(after=index_stop_LFP-1)
         external_df_offset2 = external_df_offset
     elif external_rec_duration > LFP_rec_duration:
         rec_duration = LFP_rec_duration
-        index_stop_external = rec_duration*loaded_dict['sf_external']
+        index_stop_external = rec_duration*sf_external
         external_df_offset2 = external_df_offset.truncate(after=index_stop_external-1)
         LFP_df_offset2 = LFP_df_offset
 

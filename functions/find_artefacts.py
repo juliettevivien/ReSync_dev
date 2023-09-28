@@ -9,8 +9,10 @@ import json
 
 def find_external_sync_artefact(
     data: np.ndarray, 
+    sf_external,
     ignore_first_seconds_external=None, 
-    consider_first_seconds_external=None
+    consider_first_seconds_external=None,
+
 ):
 
     """ 
@@ -64,10 +66,10 @@ def find_external_sync_artefact(
     stop_index = len(data)-2
 
     if ignore_first_seconds_external:
-        start_index = ignore_first_seconds_external*loaded_dict['sf_external']
+        start_index = ignore_first_seconds_external*sf_external
 
     if consider_first_seconds_external:
-        stop_index = consider_first_seconds_external*loaded_dict['sf_external']
+        stop_index = consider_first_seconds_external*sf_external
 
     # check polarity of artefacts before detection:
     # to be properly detected in external channel, artefacts have to look like a downward deflection 
@@ -80,16 +82,16 @@ def find_external_sync_artefact(
     #start looking at each value one by one and append the timepoint to the list depending on the state and if thresh_BIP is crossed
     for q in range(start_index,stop_index):
         if (stimON == False) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
-            if q >= 0.2*loaded_dict['sf_external']:
+            if q >= 0.2*sf_external:
                 index_artefact_start_external.append(q)
                 stimON = True
                 q = q+1
-            elif q < 0.2*loaded_dict['sf_external']:
+            elif q < 0.2*sf_external:
                 print ('External recording started with stim already ON. Ignoring first artefact')
                 stimON = True
                 q = q+1
         if (stimON == True) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
-            if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] > thresh_BIP)):
+            if (all(data[(q+2):(q+int(0.5*sf_external))] > thresh_BIP)):
                 stimON = False
                 q = q+1
         else:
@@ -102,7 +104,7 @@ def find_external_sync_artefact(
                 stimON = True
                 q = q+1
             if (stimON == True) and (data[q] <= thresh_BIP) and (data[q] < data[q+1]) and (data[q] < data[q-1]):
-                if (all(data[(q+2):(q+int(0.5*loaded_dict['sf_external']))] > thresh_BIP)):
+                if (all(data[(q+2):(q+int(0.5*sf_external))] > thresh_BIP)):
                     stimON = False
                     q = q+1
             else:
@@ -118,7 +120,8 @@ def find_external_sync_artefact(
 # Detection of artefacts in LFP
 
 def find_LFP_sync_artefact(
-    lfp_data: np.ndarray, 
+    lfp_data: np.ndarray,
+    sf_LFP,
     use_kernel: str = '1',
     consider_first_seconds_LFP=None,
 ):
@@ -182,13 +185,13 @@ def find_LFP_sync_artefact(
 
     # calculate a ratio between std dev and maximum during
     # the first seconds to check whether an stim-artef was present 
-    ratio_max_sd = np.max(res[:loaded_dict['sf_LFP']*30] / np.std(res[:loaded_dict['sf_LFP']*5]))
+    ratio_max_sd = np.max(res[:sf_LFP*30] / np.std(res[:sf_LFP*5]))
     
     # use peak of kernel dot products    
     pos_idx = find_peaks(x=res, height=.3 * max(res),
-                        distance=loaded_dict['sf_LFP'])[0]
+                        distance=sf_LFP)[0]
     neg_idx = find_peaks(x=-res, height=-.3 * min(res),
-                        distance=loaded_dict['sf_LFP'])[0]
+                        distance=sf_LFP)[0]
 
     # check whether signal is inverted
     if neg_idx[0] < pos_idx[0]:
@@ -233,8 +236,8 @@ def find_LFP_sync_artefact(
 
 
     if consider_first_seconds_LFP:
-        border_start = loaded_dict['sf_LFP']*consider_first_seconds_LFP
-        border_end = len(lfp_data) - (loaded_dict['sf_LFP'] * consider_first_seconds_LFP)
+        border_start = sf_LFP*consider_first_seconds_LFP
+        border_end = len(lfp_data) - (sf_LFP * consider_first_seconds_LFP)
         sel = np.logical_or(np.array(stim_idx) < border_start,
                              np.array(stim_idx) > border_end)
         stim_idx = list(compress(stim_idx, sel))

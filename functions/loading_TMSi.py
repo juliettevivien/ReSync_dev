@@ -34,6 +34,7 @@ def load_TMSi_artefact_channel(
 	external_rec_ch_names = TMSi_rec.ch_names
 	n_chan = len(TMSi_rec.ch_names)
 	time_duration_TMSi_s = (TMSi_rec.n_times/TMSi_rec.info['sfreq']).astype(float)
+	sf_external = int(TMSi_rec.info['sfreq'])
 
 	if is_channel_in_list(external_rec_ch_names, loaded_dict['ch_name_BIP']):
 		ch_t = TMSi_rec.ch_names.index(loaded_dict['ch_name_BIP'])
@@ -58,7 +59,7 @@ def load_TMSi_artefact_channel(
 		raise ValueError(f'The channel does not exist in the list. Please choose a channel in the following list and write its name in the config file  {external_rec_ch_names}')
 
 
-	return TMSi_channel, TMSi_file, external_rec_ch_names
+	return TMSi_channel, TMSi_file, external_rec_ch_names, sf_external
 
 
 
