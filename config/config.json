@@ -6,20 +6,7 @@
     "BIP_ch_index": 0,
     "kernel": "2",
     "thresh_external": -0.001,
-    "real_index_LFP": 0,
     "consider_first_seconds_LFP": null,
     "consider_first_seconds_external": null,
-    "ignore_first_seconds_external": null,
-    "index_real_artefacts_LFP": [
-        0,
-        2,
-        4,
-        6
-    ],
-    "index_real_artefacts_BIP": [
-        0,
-        1,
-        2,
-        3
-    ]
+    "ignore_first_seconds_external": null
 }
