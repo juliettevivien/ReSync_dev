@@ -39,6 +39,7 @@ def run_resync(
     BIP_channel, 
     external_rec_ch_names,
     sf_external,
+    real_art_time_LFP,
     SHOW_FIGURES = True,
 ):
 
@@ -102,7 +103,8 @@ def run_resync(
     # PLOT 1 : plot the signal of the channel used for artefact detection in intracerebral recording:
     plot.plot_LFP_artefact_channel(loaded_dict['subject_ID'], 
                                    LFP_timescale_s, 
-                                   lfp_sig, 'darkorange', 
+                                   lfp_sig, 
+                                   'darkorange', 
                                    savingpath = saving_path)
     if SHOW_FIGURES: plt.show()
     else: plt.close()
@@ -126,7 +128,7 @@ def run_resync(
     plot.plot_channel(loaded_dict['subject_ID'], 
                       LFP_timescale_s, 
                       lfp_sig,
-                      'darkorange',scatter=True)
+                      'darkorange',scatter=False)
     plt.ylabel('Intracerebral LFP channel (µV)')
     for xline in art_time_LFP:
         plt.axvline(x=xline, 
@@ -191,29 +193,29 @@ def run_resync(
                                          art_time_BIP, 
                                          LFP_rec_ch_names, 
                                          external_rec_ch_names, 
-                                         loaded_dict['real_index_LFP'],
+                                         real_art_time_LFP,
                                          sf_LFP,
                                          sf_external)
 
 
     # PLOT 5 : plot the artefact adjusted by user in the intracerebral channel:
-    plot.plot_channel(loaded_dict['subject_ID'], 
-                      LFP_timescale_s, 
-                      lfp_sig, 'darkorange',
-                      scatter=True)
-    plt.ylabel('Intracerebral LFP channel (µV)')
-    for xline in art_time_LFP:
-        plt.axvline(x=xline+(loaded_dict['real_index_LFP']/sf_LFP), 
+    if real_art_time_LFP != 0 :
+        plot.plot_channel(loaded_dict['subject_ID'], 
+                        LFP_timescale_s, 
+                        lfp_sig, 'darkorange',
+                        scatter=True)
+        plt.ylabel('Intracerebral LFP channel (µV)')
+        plt.axvline(x=real_art_time_LFP, 
                     ymin=min(lfp_sig), 
                     ymax=max(lfp_sig), 
                     color='black', 
                     linestyle='dashed', 
                     alpha=.3,)
-    plt.xlim(art_time_LFP[0]-0.1,art_time_LFP[0]+0.3)
-    plt.gcf()
-    plt.savefig(saving_path + '\\Fig5-Intracerebral channel - first artefact detected with correction by user - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
-    if SHOW_FIGURES: plt.show()
-    else: plt.close()
+        plt.xlim(real_art_time_LFP-0.1,real_art_time_LFP+0.3)
+        plt.gcf()
+        plt.savefig(saving_path + '\\Fig5-Intracerebral channel - first artefact detected with correction by user - kernel ' + str(loaded_dict['kernel']) + '.png',bbox_inches='tight')
+        if SHOW_FIGURES: plt.show()
+        else: plt.close()
 
     # PLOT 6 : plot the external channel with its artefacts detected:
     plot.plot_channel(loaded_dict['subject_ID'], 

@@ -10,7 +10,7 @@ def crop_rec(
     art_time_BIP,
     LFP_rec_ch_names: list,
     external_rec_ch_names: list,
-    real_index_LFP: list,
+    real_art_time_LFP: float,
     sf_LFP,
     sf_external
 ):
@@ -53,10 +53,15 @@ def crop_rec(
 
     # LFP #
     # Crop beginning of LFP recording 1 second before first artefact:
-
-    time_start_LFP_0 = art_time_LFP[0]-1 # 1s before first artefact
-    index_start_LFP_0 = time_start_LFP_0*(sf_LFP)
-    index_start_LFP = index_start_LFP_0 + real_index_LFP ## adjust index for proper alignement
+    if real_art_time_LFP == 0:
+        time_start_LFP_0 = art_time_LFP[0]-1 # 1s before first artefact
+        index_start_LFP = time_start_LFP_0*(sf_LFP)
+    elif real_art_time_LFP != 0:
+        diff_art_time = real_art_time_LFP - art_time_LFP[0]
+        diff_art_idx = diff_art_time*(sf_LFP)
+        time_start_LFP_0 = art_time_LFP[0]-1 # 1s before first artefact
+        index_start_LFP_0 = time_start_LFP_0*(sf_LFP)
+        index_start_LFP = index_start_LFP_0 + diff_art_idx
 
     LFP_df = pd.DataFrame(LFP_array) # convert np.ndarray to dataframe
     LFP_df_transposed = pd.DataFrame.transpose(LFP_df) # invert rows and columns
