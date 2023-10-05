@@ -111,3 +111,26 @@ def extract_elements(data_list, indices_to_extract):
     extracted_elements = getter(data_list)
 
     return extracted_elements
+
+
+def get_input_y_n(message: str) -> str:
+
+    """Get `y` or `n` user input."""
+
+    while True:
+
+        user_input = input(f"{message} (y/n)? ")
+
+        if user_input.lower() in ["y", "n"]:
+
+            break
+
+        print(
+
+            f"Input must be `y` or `n`. Got: {user_input}."
+
+            " Please provide a valid input."
+
+        )
+
+    return user_input
