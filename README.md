@@ -1,7 +1,7 @@
 # ReSync
 
 ## About
-ReSync is an open-acess tool to align intracerebral recordings (from DBS electrodes) with external recordings. A manuscript describing ReSync's functionality and methodology will follow.
+ReSync is an open-acess tool to align intracerebral recordings (from DBS electrodes) with external electrophysiological recordings. A manuscript describing ReSync's functionality and methodology will (hopefully) follow.
 
 This repo is structured as follows: 
 
@@ -15,6 +15,8 @@ This repo is structured as follows:
 ├── functions
 │   ├── crop
 │   ├── find_artefacts
+│   ├── find_packet_loss
+│   ├── interactive
 │   ├── loading_TMSi
 │   ├── main_resync
 │   ├── plotting
@@ -57,21 +59,14 @@ These instructions will get you a copy of the project up and running on your loc
 {
     "saving_path": "....", # the path to save the cropped recordings and all the figures 
     "subject_ID": "...", # the ID of the subject/session
-    "sf_external": 4000, # the sampling frequency of the external data recorder
-    "sf_LFP": 250,  # the sampling frequency of the intracerebral recorder (DBS electrodes)
     "ch_name_BIP": "BIP 01", # the name of the channel containing the artefacts in the external recorder (bipolar channel)
     "LFP_ch_index": 0, # the index of the channel containing the artefacts in the intracerebral recorder
-    "BIP_ch_index": 0, # the index of the channel containing the artefacts in the external recorder (bipolar channel)
-    "kernel": "1", # the kernel to use for artefact detection in intracerebral channel (either "1" or "2")
+    "BIP_ch_index": 0, # AUTOMATICALLY FILLED the index of the channel containing the artefacts in the external recorder (bipolar channel)
+    "kernel": "2", # the kernel to use for artefact detection in intracerebral channel (either "1" or "2"). Default is "2".
     "thresh_external": false,  # leave to false if the artefacts in the external recording are properly detected, but insert a value if artefacts are not well detected (this value depends on the sampling frequency of the external data recorder, our default threshold is set to -0.001)
-    "real_index_LFP": -1, # change this value if the sample detected as start of the artefact in intracerebral channel (as seen in the figure) is not correct --> in this example, the algorithm detected the start of the artefact as one sample too far.
-    "consider_first_seconds_LFP": 20, # change this delay (in seconds) if the session was in StimOn, it will only look for artefacts during the X first seconds and X last seconds of the recording 
+    "consider_first_seconds_LFP": null, # change this delay (in seconds) if the session was in StimOn, it will only look for artefacts during the X first seconds and X last seconds of the recording
     "consider_first_seconds_external": null, # change this delay (in seconds) if the session was in StimOn, it will only look for artefacts during the X first seconds and X last seconds of the recording 
     "ignore_first_seconds_external": 20, # change this delay if you have unrelated artefacts in your external channel in the beginning of the recording, or replace to null
-    "timeshift_ignore_first_seconds_external": null, 
-    "index_real_artefacts_LFP": [0,1,2,3,4,5], # for timeshift analysis, select which of the detected artefacts are real artefacts and present in both intracerebral and external recording, and report here the index of these artefacts, to examine them further
-    "index_real_artefacts_BIP": [0,1,2,3,4,5] # for timeshift analysis, select which of the detected artefacts are real artefacts and present in both intracerebral and external recording, and report here the index of these artefacts, to examine them further
-}
 ```
 
 #### 2. Open the notebook and import your own data
@@ -80,14 +75,16 @@ These instructions will get you a copy of the project up and running on your loc
     - LFP_array (np.ndarray, multi dimensional): the LFP recording which has to be aligned, containing all channels
     - lfp_sig (np.ndarray, 1d): the channel containing the LFP signal from the hemisphere where the stimulation was delivered to create artefacts
     - LFP_rec_ch_names (list): names of all the channels, in a list (will be used to annotate cropped recording)
+    - sf_LFP (int): sampling frequency of the intracranial recording
 * load your own external data. To run, the ```run_resync``` function will need:
     - BIP_channel (np.ndarray, 1d): the channel containing the signal from the bipolar electrode used to pick up the artefacts on the IPG/cable
     - external_file (np.ndarray, multi-dimensional): the complete external recording containing all channels recorded
     - external_rec_ch_names (list, same length as the number of channels in external_file): list of the channels names, to rename them accordingly after alignment
+    - sf_external (int): sampling frequency of the external data recorder
 
-#### 3. Use run_resync and run_timeshift_analysis
-* run the cell with the ```run_resync``` function. Adjust parameters after first run if needed and re-run
-* when the recordings are properly aligned, the next cell, containing the ```run_timeshift_analysis``` function can be used
+#### 3. Use run_resync
+* run the cell with the ```run_resync``` function. Manually adjust sample for intracranial artefact after first run if needed and re-run
+* when the recordings are properly aligned, the next cells can also be ran to analyze timeshift
 
 ## Authors
 
