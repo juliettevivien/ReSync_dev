@@ -30,7 +30,7 @@ def define_folders():
 
 
 
-### FUNCTIONS FOR CONVERSION time/index###
+### FUNCTIONS FOR CONVERSION time/index ###
 
 import numpy as np
 
@@ -38,8 +38,7 @@ import numpy as np
 
 def convert_index_to_time(
     art_idx: list,
-    sf: int,
-    milliseconds = False
+    sf: int
 ):
     """ 
     Function to calculate timestamps 
@@ -49,30 +48,23 @@ def convert_index_to_time(
         - art_idx : list of indexes
         - sf : sampling frequency of the signal 
         from which the indexes come from
-        - milliseconds : True/False, default is False
-    
+
     Returns:
         - art_time : list of timestamps
     """
 
     art_time = []
-    for n in np.arange(0,len(art_idx),1):
-        if milliseconds :
-            art_time_x = art_idx[n]*1000/sf
-            art_time.append(art_time_x)
-        else :
-            art_time_x = art_idx[n]/sf
-            art_time.append(art_time_x)
+    for n in np.arange(0, len(art_idx), 1):
+        art_time_x = art_idx[n]/sf
+        art_time.append(art_time_x)
         
-    
     return art_time
 
 
 
 def convert_time_to_index(
     art_time: list, 
-    sf: int,
-    milliseconds = False
+    sf: int
 ):
     
     """ 
@@ -82,20 +74,15 @@ def convert_time_to_index(
         - art_time : list of timestamps
         - sf : sampling frequency of the signal 
         from which the timestamps come from
-        - milliseconds : True/False, default is False
-            
+    
     Returns:
         - art_idx : list of indexes    
     """
 
     art_idx = []
-    for n in np.arange(0,len(art_time),1):
-        if milliseconds:
-            art_idx_x = art_time[n]*sf/1000
-            art_idx.append(art_idx_x)
-        else:
-            art_idx_x = art_time[n]*sf
-            art_idx.append(art_idx_x)
+    for n in np.arange(0, len(art_time), 1):
+        art_idx_x = art_time[n]*sf
+        art_idx.append(art_idx_x)
     
     return art_idx
 

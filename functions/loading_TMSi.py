@@ -18,8 +18,15 @@ def load_TMSi_artefact_channel(
 		- TMSi_data : TMSiFileFormats.file_readers.poly5reader.Poly5Reader
 
 	Returns:
-		- TMSi_channel : single channel as np.ndarray
-        - TMSi_file : np.ndarray (will be used later to crop TMSi channels all at once)
+		- TMSi_channel (np.ndarray with shape (y,)): the channel of the external 
+            recording to be used for alignment (the one containing deep brain 
+            stimulation artefacts = the channel recorded with the bipolar 
+            electrode, y datapoints)
+        - TMSi_file (np.ndarray with shape: (x, y)): the external recording 
+            containing all recorded channels (x channels, y datapoints)
+		- external_rec_ch_names (list of x names): the names of all the channels 
+            recorded externally
+		- sf_external (int): sampling frequency of external recording
 	"""
 
 	# import SETTINGS
@@ -56,14 +63,18 @@ def load_TMSi_artefact_channel(
 		TMSi_file = TMSi_rec.get_data()
 
 	else:
-		raise ValueError(f'The channel does not exist in the list. Please choose a channel in the following list and write its name in the config file  {external_rec_ch_names}')
+		raise ValueError(f'The channel does not exist in the list. '
+				   		f'\n\tPlease choose a channel in the following list and write its name in the config file  {external_rec_ch_names}')
 
 
 	return TMSi_channel, TMSi_file, external_rec_ch_names, sf_external
 
 
 
-def is_channel_in_list(channel_array, desired_channel_name):
+def is_channel_in_list(
+		channel_array, 
+		desired_channel_name
+):
     if desired_channel_name.lower() in (channel.lower() for channel in channel_array):
         return True
     else:

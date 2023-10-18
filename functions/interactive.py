@@ -43,8 +43,8 @@ def interaction(timescale, data):
     return artifact_x[-1]
 
 
-def select_sample(signal,sf):
-    signal_timescale_s = np.arange(0,(len(signal)/sf),(1/sf))
+def select_sample(signal, sf):
+    signal_timescale_s = np.arange(0, (len(signal)/sf), (1/sf))
     selected_x = interaction(signal_timescale_s, signal)
 
     # Find the index of the closest value
