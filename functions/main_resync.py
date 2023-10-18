@@ -367,14 +367,100 @@ def run_resync(
     print(
         'Alignment performed ! \n' 
         'Please check carefully in all figures that the samples selected \n'
-        'as start of the artefact are correct, and if they are not \n'
-        'you can either a. try with the other kernel, or b. select manually\n'
-        'the sample where the artefact starts and re-run the function in the next notebook cell.'
+        'as start of the artefact are correct, and if they are not you can either\n'
+        'a. try with the other kernel, or '
+        'b. select manually the sample where the artefact starts and re-run the function in the next notebook cell.'
     )
 
     return LFP_df_offset, external_df_offset
 
 
+
+
+
+def check_packet_loss(
+        json_fname: str,
+        sub: str
+):
+    
+    j = pkl.load_sourceJSON(sub, json_fname)
+
+    prc_data_codes = {
+        'signal_test': 'CalibrationTests',
+        'streaming': 'BrainSenseTimeDomain',
+        'survey': 'LfpMontageTimeDomain',
+        'indef_streaming': 'IndefiniteStreaming'
+    }
+
+    mod = 'streaming'
+    list_of_streamings = j[prc_data_codes[mod]]
+
+    for i_dat, dat in enumerate(list_of_streamings):
+        print(i_dat)
+        new_lfp = pkl.check_missings_in_lfp(dat)
+
+
+
+
+
+def ecg(
+        LFP_df_offset, 
+        sf_LFP,
+        external_df_offset,
+        sf_external,
+        xmin,
+        xmax,
+        SHOW_FIGURES=True
+):
+    
+    #import settings
+    json_path = os.path.join(os.getcwd(), 'config')
+    json_filename = 'config.json'  # dont forget json extension
+    with open(os.path.join(json_path, json_filename), 'r') as f:
+        loaded_dict =  json.load(f)
+
+    #set saving path
+    if not loaded_dict['saving_path']:
+        saving_path = utils.define_folders()
+    else:
+        saving_path = os.path.join(os.path.normpath(loaded_dict['saving_path']), loaded_dict['subject_ID'])
+        if not os.path.isdir(saving_path):
+            os.makedirs(saving_path)
+
+    # Reselect artefact channels in the aligned (= cropped) files
+    LFP_channel_offset = LFP_df_offset.iloc[:, loaded_dict['LFP_ch_index']].to_numpy()  
+    BIP_channel_offset = external_df_offset.iloc[:, loaded_dict['BIP_ch_index']].to_numpy() 
+
+    # pre-processing of external bipolar channel before searching artefacts:
+    filtered_external_offset = preproc.filtering(BIP_channel_offset)
+
+    # Generate new timescales:
+    LFP_timescale_offset_s = np.arange(0, (len(LFP_channel_offset)/sf_LFP), 1/sf_LFP)
+    external_timescale_offset_s = np.arange(0, (len(BIP_channel_offset)/sf_external), 1/sf_external)
+
+    #make plot on beginning of recordings:
+    fig, (ax1, ax2) = plt.subplots(2,1)
+    fig.suptitle(str(loaded_dict['subject_ID']))
+    fig.set_figheight(6)
+    fig.set_figwidth(12)
+    ax1.axes.xaxis.set_ticklabels([])
+    ax2.set_xlabel('Time (s)')
+    ax1.set_ylabel('Intracerebral LFP channel (µV)')
+    ax2.set_ylabel('External bipolar channel (mV)')
+    ax1.set_xlim(xmin, xmax) 
+    ax2.set_xlim(xmin, xmax)
+    #ax1.set_ylim(-50, 20) 
+    ax1.plot(LFP_timescale_offset_s, LFP_channel_offset, color='darkorange', zorder=1, linewidth=1)
+    ax2.plot(external_timescale_offset_s, filtered_external_offset, color='darkcyan', zorder=1, linewidth=1) 
+    fig.savefig(saving_path + '\\Fig_ECG.png', bbox_inches='tight')
+    if SHOW_FIGURES: plt.show()
+    else: plt.close()
+
+
+
+
+
+### OUT OF DATE FUNCTION: ### 
 
 def run_timeshift_analysis(
     LFP_df_offset, 
@@ -603,81 +689,3 @@ def run_timeshift_analysis(
 
 
 
-
-def check_packet_loss(
-        json_fname: str,
-        sub: str
-):
-    
-    j = pkl.load_sourceJSON(sub, json_fname)
-
-    prc_data_codes = {
-        'signal_test': 'CalibrationTests',
-        'streaming': 'BrainSenseTimeDomain',
-        'survey': 'LfpMontageTimeDomain',
-        'indef_streaming': 'IndefiniteStreaming'
-    }
-
-    mod = 'streaming'
-    list_of_streamings = j[prc_data_codes[mod]]
-
-    for i_dat, dat in enumerate(list_of_streamings):
-        print(i_dat)
-        new_lfp = pkl.check_missings_in_lfp(dat)
-
-
-
-
-
-def ecg(
-        LFP_df_offset, 
-        sf_LFP,
-        external_df_offset,
-        sf_external,
-        SHOW_FIGURES = True
-):
-    
-    #import settings
-    json_path = os.path.join(os.getcwd(), 'config')
-    json_filename = 'config.json'  # dont forget json extension
-    with open(os.path.join(json_path, json_filename), 'r') as f:
-        loaded_dict =  json.load(f)
-
-    #set saving path
-    if loaded_dict['saving_path'] == False:
-        saving_path = utils.define_folders()
-    else:
-        saving_path = os.path.join(os.path.normpath(loaded_dict['saving_path']), loaded_dict['subject_ID'])
-        if not os.path.isdir(saving_path):
-            os.makedirs(saving_path)
-
-
-    # Reselect artefact channels in the aligned (= cropped) files
-    LFP_channel_offset = LFP_df_offset.iloc[:,loaded_dict['LFP_ch_index']].to_numpy()  
-    BIP_channel_offset = external_df_offset.iloc[:,loaded_dict['BIP_ch_index']].to_numpy() 
-
-    # pre-processing of external bipolar channel before searching artefacts:
-    filtered_external_offset = preproc.filtering(BIP_channel_offset)
-
-    # Generate new timescales:
-    LFP_timescale_offset_s = np.arange(0,(len(LFP_channel_offset)/sf_LFP),1/sf_LFP)
-    external_timescale_offset_s = np.arange(0,(len(BIP_channel_offset)/sf_external),1/sf_external)
-
-    #make plot on beginning of recordings:
-    fig, (ax1, ax2) = plt.subplots(2,1)
-    fig.suptitle(str(loaded_dict['subject_ID']))
-    fig.set_figheight(6)
-    fig.set_figwidth(12)
-    ax1.axes.xaxis.set_ticklabels([])
-    ax2.set_xlabel('Time (s)')
-    ax1.set_ylabel('Intracerebral LFP channel (µV)')
-    ax2.set_ylabel('External bipolar channel (mV)')
-    ax1.set_xlim(0,5.6) 
-    ax2.set_xlim(0,5.6)
-    ax1.set_ylim(-50,20) 
-    #ax2.set_ylim(-0.004,-0.002) 
-    ax1.plot(LFP_timescale_offset_s,LFP_channel_offset,color='darkorange',zorder=1, linewidth=1)
-    ax2.plot(external_timescale_offset_s,BIP_channel_offset, color='darkcyan',zorder=1, linewidth=1) 
-    fig.savefig(saving_path + '\\Fig_ECG.png',bbox_inches='tight')
-    if SHOW_FIGURES: plt.show()
-    else: plt.close()

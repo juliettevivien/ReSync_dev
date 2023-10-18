@@ -58,7 +58,7 @@ def load_TMSi_artefact_channel(
 			f'\n\twith a recording duration of {time_duration_TMSi_s} seconds.'      
 			f'\n\t{n_chan} channels were labeled as \n{TMSi_rec.ch_names}.')
 		
-		print(f'the channel used to align datas is the channel named {TMSi_rec.ch_names[ch_t]} and has index {ch_t}')
+		print(f'The channel used to align datas is the channel named {TMSi_rec.ch_names[ch_t]} and has index {ch_t}')
 
 		TMSi_file = TMSi_rec.get_data()
 
