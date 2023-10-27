@@ -5,10 +5,12 @@ utilisation function
 import os
 import json
 from tkinter.filedialog import askdirectory
+import scipy
+import numpy as np
+import operator
 
 
-
-def define_folders():
+def _define_folders():
 
     """
     This function is used if the user hasn't already define 
@@ -32,11 +34,9 @@ def define_folders():
 
 ### FUNCTIONS FOR CONVERSION time/index ###
 
-import numpy as np
-
 # Conversion between index and timestamps
 
-def convert_index_to_time(
+def _convert_index_to_time(
     art_idx: list,
     sf: int
 ):
@@ -62,7 +62,7 @@ def convert_index_to_time(
 
 
 
-def convert_time_to_index(
+def _convert_time_to_index(
     art_time: list, 
     sf: int
 ):
@@ -88,9 +88,8 @@ def convert_time_to_index(
 
 
 
-import operator
 
-def extract_elements(data_list, indices_to_extract):
+def _extract_elements(data_list, indices_to_extract):
     # Create an itemgetter object with the indices specified in indices_to_extract
     getter = operator.itemgetter(*indices_to_extract)
 
@@ -100,7 +99,8 @@ def extract_elements(data_list, indices_to_extract):
     return extracted_elements
 
 
-def get_input_y_n(message: str) -> str:
+
+def _get_input_y_n(message: str) -> str:
 
     """Get `y` or `n` user input."""
 
@@ -121,3 +121,16 @@ def get_input_y_n(message: str) -> str:
         )
 
     return user_input
+
+
+def _filtering(
+        BIP_channel
+):
+    """
+    This function applies a highpass filter at 1Hz to detrend the data.
+    """
+
+    b, a = scipy.signal.butter(1, 0.05, 'highpass')
+    filteredHighPass = scipy.signal.filtfilt(b, a, BIP_channel)
+
+    return filteredHighPass

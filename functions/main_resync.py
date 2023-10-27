@@ -10,7 +10,6 @@ import functions.utils as utils
 import functions.find_artefacts as artefact
 import functions.plotting as plot
 import functions.crop as crop
-import functions.preprocessing as preproc
 import functions.find_packet_loss as pkl
 
 ## set font sizes and other parameters for the figures
@@ -90,7 +89,7 @@ def run_resync(
 
     # set saving path
     if not loaded_dict['SAVING_PATH']:
-        saving_path = utils.define_folders()
+        saving_path = utils._define_folders()
     else:
         saving_path = os.path.join(
             os.path.normpath(loaded_dict['SAVING_PATH']),
@@ -136,7 +135,7 @@ def run_resync(
         consider_first_seconds_LFP=None
     )
 
-    art_time_LFP = utils.convert_index_to_time(
+    art_time_LFP = utils._convert_index_to_time(
         art_idx=art_idx_LFP,
         sf=sf_LFP
     ) 
@@ -206,7 +205,7 @@ def run_resync(
 
     # find artefacts in external bipolar channel:
 
-    filtered_external = preproc.filtering(BIP_channel) # apply a highpass filter at 1Hz to the external bipolar channel (detrending)
+    filtered_external = utils._filtering(BIP_channel) # apply a highpass filter at 1Hz to the external bipolar channel (detrending)
 
     # PLOT 2 : plot the signal of the channel used for artefact detection in external recording:
     plot.plot_BIP_artefact_channel(
@@ -230,7 +229,7 @@ def run_resync(
     )
     
     
-    art_time_BIP = utils.convert_index_to_time(
+    art_time_BIP = utils._convert_index_to_time(
         art_idx=art_idx_BIP, 
         sf=sf_external
     )
@@ -421,7 +420,7 @@ def ecg(
 
     #set saving path
     if not loaded_dict['SAVING_PATH']:
-        saving_path = utils.define_folders()
+        saving_path = utils._define_folders()
     else:
         saving_path = os.path.join(os.path.normpath(loaded_dict['SAVING_PATH']), loaded_dict['SUBJECT_ID'])
         if not os.path.isdir(saving_path):
@@ -432,7 +431,7 @@ def ecg(
     BIP_channel_offset = external_df_offset.iloc[:, loaded_dict['BIP_CH_INDEX']].to_numpy() 
 
     # pre-processing of external bipolar channel before searching artefacts:
-    filtered_external_offset = preproc.filtering(BIP_channel_offset)
+    filtered_external_offset = utils._filtering(BIP_channel_offset)
 
     # Generate new timescales:
     LFP_timescale_offset_s = np.arange(0, (len(LFP_channel_offset)/sf_LFP), 1/sf_LFP)
@@ -502,7 +501,7 @@ def run_timeshift_analysis(
 
     #set saving path
     if loaded_dict['SAVING_PATH'] == False:
-        saving_path = utils.define_folders()
+        saving_path = utils._define_folders()
     else:
         saving_path = os.path.join(os.path.normpath(loaded_dict['SAVING_PATH']), loaded_dict['SUBJECT_ID'])
         if not os.path.isdir(saving_path):
@@ -523,12 +522,12 @@ def run_timeshift_analysis(
                                                          consider_first_seconds_LFP=None
     )
 
-    art_time_LFP_offset = utils.convert_index_to_time(art_idx_LFP_offset,
+    art_time_LFP_offset = utils._convert_index_to_time(art_idx_LFP_offset,
                                                       sf_LFP
     )
 
     # pre-processing of external bipolar channel before searching artefacts:
-    filtered_external_offset = preproc.filtering(BIP_channel_offset)
+    filtered_external_offset = utils._filtering(BIP_channel_offset)
 
     # find artefacts again in cropped external bipolar channel:
     art_idx_BIP_offset = artefact.find_external_sync_artefact(data = filtered_external_offset, 
@@ -536,7 +535,7 @@ def run_timeshift_analysis(
                                                               ignore_first_seconds_external=None, 
                                                               consider_first_seconds_external=None
     )
-    art_time_BIP_offset = utils.convert_index_to_time(art_idx_BIP_offset, 
+    art_time_BIP_offset = utils._convert_index_to_time(art_idx_BIP_offset, 
                                                       sf_external
     )
 
@@ -606,10 +605,10 @@ def run_timeshift_analysis(
 
     
 
-    real_art_time_LFP_offset= utils.extract_elements(art_time_LFP_offset,
+    real_art_time_LFP_offset= utils._extract_elements(art_time_LFP_offset,
                                                      loaded_dict['index_real_artefacts_LFP']
     ) 
-    real_art_time_BIP_offset= utils.extract_elements(art_time_BIP_offset, 
+    real_art_time_BIP_offset= utils._extract_elements(art_time_BIP_offset, 
                                                      loaded_dict['index_real_artefacts_BIP']
     )
 

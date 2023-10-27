@@ -49,14 +49,6 @@ def crop_rec(
 
     """
 
-
-    #import settings
-    json_path = os.path.join(os.getcwd(), 'config')
-    json_filename = 'config.json'  # dont forget json extension
-    with open(os.path.join(json_path, json_filename), 'r') as f:
-        loaded_dict =  json.load(f)
-
-
     # LFP #
     # Crop beginning of LFP recording 1 second before first artefact:
     if real_art_time_LFP == 0:
