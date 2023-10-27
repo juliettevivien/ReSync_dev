@@ -1,0 +1,10 @@
+SAVING_PATH = "C:\\Users\\Juliette\\OneDrive\\Documents\\PhD\\Figures\\Sync analysis\\ReSync_grouped\\test"
+SUBJECT_ID = "Sub024 24MFU M0S0"
+CH_NAME_BIP = "BIP 01"
+KERNEL = 2
+LFP_CH_INDEX = 0
+BIP_CH_INDEX = 0
+THRESH_EXTERNAL = -0.001
+consider_first_seconds_LFP = None
+consider_first_seconds_external = None
+ignore_first_seconds_external = None
