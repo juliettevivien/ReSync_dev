@@ -87,28 +87,33 @@ def _load_TMSi_artefact_channel(
 
 
 # extract variables from LFP recording:
-def _set_lfp_data(
-        LFP_rec, 
-        ch_i = 0
-):
-    LFP_array = LFP_rec.get_data()
-    lfp_sig = LFP_rec.get_data()[ch_i]
-    LFP_rec_ch_names = LFP_rec.ch_names
-    sf_LFP = int(LFP_rec.info["sfreq"])
+def _set_lfp_data(LFP_rec):
 
-    n_chan = len(LFP_rec.ch_names)
-    time_duration_LFP = (LFP_rec.n_times/LFP_rec.info['sfreq']).astype(float)
-    print(     
-        f'The data object has:\n\t{LFP_rec.n_times} time samples,'      
-        f'\n\tand a sample frequency of {LFP_rec.info["sfreq"]} Hz'      
-        f'\n\twith a recording duration of {time_duration_LFP} seconds.'      
-        f'\n\t{n_chan} channels were labeled as \n{LFP_rec.ch_names}.'
-    )
-    print(
-        f'The channel containing artefacts has index {ch_i} and is named {LFP_rec.ch_names[ch_i]}'
-    )
+	#import settings
+	json_path = os.path.join(os.getcwd(), 'config')
+	json_filename = 'config.json'
+	with open(os.path.join(json_path, json_filename), 'r') as f:
+		loaded_dict =  json.load(f)
 
-    return LFP_array, lfp_sig, LFP_rec_ch_names, sf_LFP
+	LFP_array = LFP_rec.get_data()
+	ch_index = loaded_dict['LFP_CH_INDEX']
+	lfp_sig = LFP_rec.get_data()[ch_index]
+	LFP_rec_ch_names = LFP_rec.ch_names
+	sf_LFP = int(LFP_rec.info["sfreq"])
+
+	n_chan = len(LFP_rec.ch_names)
+	time_duration_LFP = (LFP_rec.n_times/LFP_rec.info['sfreq']).astype(float)
+	print(     
+		f'The data object has:\n\t{LFP_rec.n_times} time samples,'      
+		f'\n\tand a sample frequency of {LFP_rec.info["sfreq"]} Hz'      
+		f'\n\twith a recording duration of {time_duration_LFP} seconds.'      
+		f'\n\t{n_chan} channels were labeled as \n{LFP_rec.ch_names}.'
+	)
+	print(
+		f'The channel containing artefacts has index {ch_index} and is named {LFP_rec.ch_names[ch_index]}'
+	)
+
+	return LFP_array, lfp_sig, LFP_rec_ch_names, sf_LFP
 
 
 def _is_channel_in_list(

@@ -4,7 +4,7 @@
     "KERNEL": "2",
     "LFP_CH_INDEX": 0,
     "AUTOMATIC": true,
-    "# comment": "The following parameters are adjusted automatically, do not change except if explicitely asked to",
+    "comment": "The following parameters are adjusted automatically, do not change except if explicitely asked to",
     "CH_NAME_BIP": "BIP 02",
     "BIP_CH_INDEX": 1,
     "THRESH_EXTERNAL": -0.001

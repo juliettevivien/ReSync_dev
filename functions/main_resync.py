@@ -84,17 +84,17 @@ def run_resync(
         loaded_dict =  json.load(f)
 
     # check that the subject ID has been entered properly in the config file:
-    if (loaded_dict['subject_ID'] is None 
-            or loaded_dict['subject_ID'] == ""):
-        raise ValueError('Please fill in the subject_ID in the config file as a str')
+    if (loaded_dict['SUBJECT_ID'] is None 
+            or loaded_dict['SUBJECT_ID'] == ""):
+        raise ValueError('Please fill in the SUBJECT_ID in the config file as a str')
 
     # set saving path
-    if not loaded_dict['saving_path']:
+    if not loaded_dict['SAVING_PATH']:
         saving_path = utils.define_folders()
     else:
         saving_path = os.path.join(
-            os.path.normpath(loaded_dict['saving_path']),
-            loaded_dict['subject_ID']
+            os.path.normpath(loaded_dict['SAVING_PATH']),
+            loaded_dict['SUBJECT_ID']
         )
         if not os.path.isdir(saving_path):
             os.makedirs(saving_path)
@@ -113,7 +113,7 @@ def run_resync(
 
     # PLOT 1 : plot the signal of the channel used for artefact detection in intracerebral recording:
     plot.plot_LFP_artefact_channel(
-        sub=loaded_dict['subject_ID'], 
+        sub=loaded_dict['SUBJECT_ID'], 
         timescale=LFP_timescale_s, 
         data=lfp_sig, 
         color='darkorange', 
@@ -132,8 +132,8 @@ def run_resync(
     art_idx_LFP = artefact.find_LFP_sync_artefact(
         lfp_data=lfp_sig,
         sf_LFP=sf_LFP,
-        use_kernel=loaded_dict['kernel'], 
-        consider_first_seconds_LFP=loaded_dict['consider_first_seconds_LFP']
+        use_kernel=loaded_dict['KERNEL'], 
+        consider_first_seconds_LFP=None
     )
 
     art_time_LFP = utils.convert_index_to_time(
@@ -143,7 +143,7 @@ def run_resync(
 
     # PLOT 3 : plot the intracerebral channel with its artefacts detected:
     plot.plot_channel(
-        sub=loaded_dict['subject_ID'], 
+        sub=loaded_dict['SUBJECT_ID'], 
         timescale=LFP_timescale_s, 
         data=lfp_sig,
         color='darkorange',
@@ -163,7 +163,7 @@ def run_resync(
     plt.savefig(
         saving_path 
         + '\\Fig3-Intracerebral channel with artefacts detected - kernel ' 
-        + str(loaded_dict['kernel']) 
+        + str(loaded_dict['KERNEL']) 
         + '.png',
         bbox_inches='tight'
     )
@@ -175,7 +175,7 @@ def run_resync(
 
     # PLOT 4 : plot the first artefact detected in intracerebral channel for verification of sample choice:
     plot.plot_channel(
-        sub=loaded_dict['subject_ID'], 
+        sub=loaded_dict['SUBJECT_ID'], 
         timescale=LFP_timescale_s, 
         data=lfp_sig, 
         color='darkorange',
@@ -195,7 +195,7 @@ def run_resync(
     plt.gcf()
     plt.savefig(saving_path 
                 + '\\Fig4-Intracerebral channel - first artefact detected - kernel ' 
-                + str(loaded_dict['kernel']) 
+                + str(loaded_dict['KERNEL']) 
                 + '.png', 
                 bbox_inches='tight'
     )
@@ -210,7 +210,7 @@ def run_resync(
 
     # PLOT 2 : plot the signal of the channel used for artefact detection in external recording:
     plot.plot_BIP_artefact_channel(
-        sub=loaded_dict['subject_ID'], 
+        sub=loaded_dict['SUBJECT_ID'], 
         timescale=external_timescale_s, 
         data=filtered_external,
         color='darkcyan',
@@ -225,8 +225,8 @@ def run_resync(
     art_idx_BIP = artefact.find_external_sync_artefact(
         data=filtered_external, 
         sf_external=sf_external,
-        ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
-        consider_first_seconds_external=loaded_dict['consider_first_seconds_external']
+        ignore_first_seconds_external=None, 
+        consider_first_seconds_external=None
     )
     
     
@@ -253,7 +253,7 @@ def run_resync(
     # PLOT 5 : plot the artefact adjusted by user in the intracerebral channel:
     if real_art_time_LFP != 0 :
         plot.plot_channel(
-            sub=loaded_dict['subject_ID'], 
+            sub=loaded_dict['SUBJECT_ID'], 
             timescale=LFP_timescale_s, 
             data=lfp_sig, 
             color='darkorange',
@@ -274,7 +274,7 @@ def run_resync(
         plt.savefig(
             saving_path 
             + '\\Fig5-Intracerebral channel - first artefact detected with correction by user - kernel ' 
-            + str(loaded_dict['kernel']) 
+            + str(loaded_dict['KERNEL']) 
             + '.png', 
             bbox_inches='tight'
         )
@@ -285,7 +285,7 @@ def run_resync(
 
     # PLOT 6 : plot the external channel with its artefacts detected:
     plot.plot_channel(
-        sub=loaded_dict['subject_ID'], 
+        sub=loaded_dict['SUBJECT_ID'], 
         timescale=external_timescale_s, 
         data=filtered_external, 
         color='darkcyan',
@@ -312,7 +312,7 @@ def run_resync(
 
     # PLOT 7 : plot the first artefact detected in external channel for verification of sample choice:
     plot.plot_channel(
-        sub=loaded_dict['subject_ID'], 
+        sub=loaded_dict['SUBJECT_ID'], 
         timescale=external_timescale_s, 
         data=filtered_external, 
         color='darkcyan',
@@ -346,7 +346,7 @@ def run_resync(
     LFP_df_offset.to_csv(
         saving_path 
         + '\\Intracerebral_LFP_' 
-        + loaded_dict['subject_ID'] 
+        + loaded_dict['SUBJECT_ID'] 
         + '_' 
         + str(sf_LFP) 
         + 'Hz.csv',
@@ -357,7 +357,7 @@ def run_resync(
     external_df_offset.to_csv(
         saving_path 
         + '\\External_data_' 
-        + loaded_dict['subject_ID'] 
+        + loaded_dict['SUBJECT_ID'] 
         + '_' 
         + str(sf_external) 
         + 'Hz.csv',
@@ -420,16 +420,16 @@ def ecg(
         loaded_dict =  json.load(f)
 
     #set saving path
-    if not loaded_dict['saving_path']:
+    if not loaded_dict['SAVING_PATH']:
         saving_path = utils.define_folders()
     else:
-        saving_path = os.path.join(os.path.normpath(loaded_dict['saving_path']), loaded_dict['subject_ID'])
+        saving_path = os.path.join(os.path.normpath(loaded_dict['SAVING_PATH']), loaded_dict['SUBJECT_ID'])
         if not os.path.isdir(saving_path):
             os.makedirs(saving_path)
 
     # Reselect artefact channels in the aligned (= cropped) files
-    LFP_channel_offset = LFP_df_offset.iloc[:, loaded_dict['LFP_ch_index']].to_numpy()  
-    BIP_channel_offset = external_df_offset.iloc[:, loaded_dict['BIP_ch_index']].to_numpy() 
+    LFP_channel_offset = LFP_df_offset.iloc[:, loaded_dict['LFP_CH_INDEX']].to_numpy()  
+    BIP_channel_offset = external_df_offset.iloc[:, loaded_dict['BIP_CH_INDEX']].to_numpy() 
 
     # pre-processing of external bipolar channel before searching artefacts:
     filtered_external_offset = preproc.filtering(BIP_channel_offset)
@@ -440,7 +440,7 @@ def ecg(
 
     #make plot on beginning of recordings:
     fig, (ax1, ax2) = plt.subplots(2,1)
-    fig.suptitle(str(loaded_dict['subject_ID']))
+    fig.suptitle(str(loaded_dict['SUBJECT_ID']))
     fig.set_figheight(6)
     fig.set_figwidth(12)
     ax1.axes.xaxis.set_ticklabels([])
@@ -461,6 +461,7 @@ def ecg(
 
 
 ### OUT OF DATE FUNCTION: ### 
+
 
 def run_timeshift_analysis(
     LFP_df_offset, 
@@ -500,10 +501,10 @@ def run_timeshift_analysis(
         loaded_dict =  json.load(f)
 
     #set saving path
-    if loaded_dict['saving_path'] == False:
+    if loaded_dict['SAVING_PATH'] == False:
         saving_path = utils.define_folders()
     else:
-        saving_path = os.path.join(os.path.normpath(loaded_dict['saving_path']), loaded_dict['subject_ID'])
+        saving_path = os.path.join(os.path.normpath(loaded_dict['SAVING_PATH']), loaded_dict['SUBJECT_ID'])
         if not os.path.isdir(saving_path):
             os.makedirs(saving_path)
 
@@ -511,15 +512,15 @@ def run_timeshift_analysis(
     ### DETECT ARTEFACTS ###
 
     # Reselect artefact channels in the aligned (= cropped) files
-    LFP_channel_offset = LFP_df_offset.iloc[:,loaded_dict['LFP_ch_index']].to_numpy()  
-    BIP_channel_offset = external_df_offset.iloc[:,loaded_dict['BIP_ch_index']].to_numpy() 
+    LFP_channel_offset = LFP_df_offset.iloc[:,loaded_dict['LFP_CH_INDEX']].to_numpy()  
+    BIP_channel_offset = external_df_offset.iloc[:,loaded_dict['BIP_CH_INDEX']].to_numpy() 
 
 
     # find artefacts again in cropped intracerebral LFP channel:
     art_idx_LFP_offset = artefact.find_LFP_sync_artefact(lfp_data=LFP_channel_offset,
                                                          sf_LFP=sf_LFP,
-                                                         use_kernel=loaded_dict['kernel'],
-                                                         consider_first_seconds_LFP=loaded_dict['consider_first_seconds_LFP']
+                                                         use_kernel=loaded_dict['KERNEL'],
+                                                         consider_first_seconds_LFP=None
     )
 
     art_time_LFP_offset = utils.convert_index_to_time(art_idx_LFP_offset,
@@ -532,8 +533,8 @@ def run_timeshift_analysis(
     # find artefacts again in cropped external bipolar channel:
     art_idx_BIP_offset = artefact.find_external_sync_artefact(data = filtered_external_offset, 
                                                               sf_external = sf_external,
-                                                              ignore_first_seconds_external=loaded_dict['ignore_first_seconds_external'], 
-                                                              consider_first_seconds_external=loaded_dict['consider_first_seconds_external']
+                                                              ignore_first_seconds_external=None, 
+                                                              consider_first_seconds_external=None
     )
     art_time_BIP_offset = utils.convert_index_to_time(art_idx_BIP_offset, 
                                                       sf_external
@@ -548,7 +549,7 @@ def run_timeshift_analysis(
 
     # PLOT 8: Both signals aligned with all their artefacts detected:
     fig, (ax1, ax2) = plt.subplots(2,1)
-    fig.suptitle(str(loaded_dict['subject_ID']))
+    fig.suptitle(str(loaded_dict['SUBJECT_ID']))
     fig.set_figheight(6)
     fig.set_figwidth(12)
     ax1.axes.xaxis.set_ticklabels([])
