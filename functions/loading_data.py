@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import json
+import functions.config as cfg
 
 # Function to open TMSi data
 
@@ -29,7 +30,7 @@ def _load_TMSi_artefact_channel(
 		- sf_external (int): sampling frequency of external recording
 	"""
 
-	# import SETTINGS
+	#import settings
 	json_path = os.path.join(os.getcwd(), 'config')
 	json_filename = 'config.json'  # dont forget json extension
 	with open(os.path.join(json_path, json_filename), 'r') as f:
@@ -43,31 +44,46 @@ def _load_TMSi_artefact_channel(
 	time_duration_TMSi_s = (TMSi_rec.n_times/TMSi_rec.info['sfreq']).astype(float)
 	sf_external = int(TMSi_rec.info['sfreq'])
 
-	if _is_channel_in_list(external_rec_ch_names, loaded_dict['ch_name_BIP']):
-		ch_t = TMSi_rec.ch_names.index(loaded_dict['ch_name_BIP'])
-		TMSi_channel = TMSi_rec.get_data()[ch_t]
-		loaded_dict['BIP_ch_index'] = ch_t
-
-		# save dict as JSON, 'w' stands for write
-		with open(os.path.join(json_path, json_filename), 'w') as f:
-				json.dump(loaded_dict, f, indent=4)
-		
-		print(     
-			f'The data object has:\n\t{TMSi_rec.n_times} time samples,'      
-			f'\n\tand a sample frequency of {TMSi_rec.info["sfreq"]} Hz'      
-			f'\n\twith a recording duration of {time_duration_TMSi_s} seconds.'      
-			f'\n\t{n_chan} channels were labeled as \n{TMSi_rec.ch_names}.')
-		
-		print(f'The channel used to align datas is the channel named {TMSi_rec.ch_names[ch_t]} and has index {ch_t}')
-
-		TMSi_file = TMSi_rec.get_data()
-
+	if loaded_dict['AUTOMATIC']:
+		# recorded with TMSi SAGA, electrode BIP 01
+		if sf_external in {4000, 4096, 512} and _is_channel_in_list(external_rec_ch_names, 'BIP 01'):
+			loaded_dict['CH_NAME_BIP'] = 'BIP 01' 
+			ch_index = TMSi_rec.ch_names.index('BIP 01')
+		# recorded with TMSi Porti, electrode Bip25 
+		elif sf_external == 2048 and _is_channel_in_list(external_rec_ch_names, 'Bip25'):
+			loaded_dict['CH_NAME_BIP'] = 'Bip25' 
+			ch_index = TMSi_rec.ch_names.index('Bip25')
+		else:
+			raise ValueError (
+				f'Data recorder or electrode unknown, please set automatic as False' 
+				f'and change CH_NAME_BIP directly in json file. Choose a channel in' 
+				f'the following list:  {external_rec_ch_names}'
+			)
 	else:
-		raise ValueError(f'The channel does not exist in the list. '
-				   		f'\n\tPlease choose a channel in the following list and write its name in the config file  {external_rec_ch_names}')
+		ch_index = TMSi_rec.ch_names.index(loaded_dict['CH_NAME_BIP'])
 
+	BIP_channel = TMSi_rec.get_data()[ch_index]
+	loaded_dict['BIP_CH_INDEX'] = ch_index
+	external_file = TMSi_rec.get_data()
 
-	return TMSi_channel, TMSi_file, external_rec_ch_names, sf_external
+	# save dict as JSON, 'w' stands for write
+	with open(os.path.join(json_path, json_filename), 'w') as f:
+			json.dump(loaded_dict, f, indent=4)
+	
+	print(     
+		f'The data object has:\n\t{TMSi_rec.n_times} time samples,'      
+		f'\n\tand a sample frequency of {TMSi_rec.info["sfreq"]} Hz'      
+		f'\n\twith a recording duration of {time_duration_TMSi_s} seconds.'      
+		f'\n\t{n_chan} channels were labeled as \n{TMSi_rec.ch_names}.'
+	)
+	
+	print(
+		f'The channel used to align datas is the channel named {TMSi_rec.ch_names[ch_index]} ' 
+		f'and has index {ch_index}'
+	)
+
+	return BIP_channel, external_file, external_rec_ch_names, sf_external
+
 
 
 # extract variables from LFP recording:

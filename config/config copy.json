@@ -1,0 +1,12 @@
+{
+    "saving_path": "C:\\Users\\Juliette\\OneDrive\\Documents\\PhD\\Figures\\Sync analysis\\ReSync_grouped\\test",
+    "subject_ID": "Sub024 24MFU M0S0",
+    "ch_name_BIP": "BIP 01",
+    "kernel": "1",
+    "LFP_ch_index": 0,
+    "BIP_ch_index": 0,
+    "thresh_external": -0.001,
+    "consider_first_seconds_LFP": null,
+    "consider_first_seconds_external": null,
+    "ignore_first_seconds_external": null
+}
